@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="behat.jira.loader.class">VIPSoft\JiraExtension\Loader\Loader</parameter>
+        <parameter key="behat.jira.service.jira.class">VIPSoft\JiraExtension\Service\JiraService</parameter>
+        <parameter key="behat.jira.service.feature_loader.class">VIPSoft\JiraExtension\Service\FeatureLoaderService</parameter>
+        <parameter key="behat.jira.listener.after_feature.class">VIPSoft\JiraExtension\EventListener\AfterFeatureListener</parameter>
+        <parameter key="behat.jira.host"></parameter>
+        <parameter key="behat.jira.user"></parameter>
+        <parameter key="behat.jira.password"></parameter>
+        <parameter key="behat.jira.jql"></parameter>
+        <parameter key="behat.jira.comment_on_pass"></parameter>
+        <parameter key="behat.jira.comment_on_fail"></parameter>
+        <parameter key="behat.jira.reopen_on_fail"></parameter>
+    </parameters>
+
+    <services>
+        <service id="behat.jira.loader" class="%behat.jira.loader.class%">
+            <argument type="service" id="behat.jira.service.feature_loader" />
+            <tag name="gherkin.loader" />
+        </service>
+
+        <service id="behat.jira.service.jira" class="%behat.jira.service.jira.class%">
+            <argument type="string">%behat.jira.host%</argument>
+            <argument type="string">%behat.jira.user%</argument>
+            <argument type="string">%behat.jira.password%</argument>
+            <argument type="string">%behat.jira.jql%</argument>
+        </service>
+
+        <service id="behat.jira.service.feature_loader" class="%behat.jira.service.feature_loader.class%">
+            <argument type="service" id="behat.jira.service.jira" />
+            <argument type="service" id="gherkin.parser" />
+        </service>
+
+        <service id="behat.jira.listener.after_feature" class="%behat.jira.listener.after_feature.class%">
+            <argument type="string">%behat.jira.comment_on_pass%</argument>
+            <argument type="string">%behat.jira.comment_on_fail%</argument>
+            <argument type="string">%behat.jira.reopen_on_fail%</argument>
+            <argument type="service" id="behat.jira.service.jira" />
+        </service>
+    </services>
+
+</container>

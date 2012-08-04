@@ -1,0 +1,27 @@
+{
+    "name": "vipsoft/jira-extension",
+    "type": "library",
+    "description": "Jira Feature loader for Behat",
+    "keywords": ["bdd", "behat", "jira", "feature"],
+    "homepage": "http://github.com/vipsoft/",
+    "license": "",
+    "authors": [
+        {
+            "name": "Anthon Pang",
+            "email": "apang@softwaredevelopment.ca",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.6",
+        "behat/behat": ">=2.4.0,<2.5.0-dev",
+        "symfony/config": ">=2.0.0,<2.2.0",
+        "symfony/dependency-injection": ">=2.0.0,<2.2.0"
+    },
+    "require-dev": {
+        "symfony/symfony": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "VIPSoft\\JiraExtension": "src/" }
+    }
+}

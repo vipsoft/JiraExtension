@@ -1,0 +1,10 @@
+default:
+  extensions:
+    VIPSoft\JiraExtension\Extension:
+      host: ~
+      user: ~
+      password: ~
+      jql: ~
+      comment_on_pass: false
+      comment_on_fail: false
+      reopen_on_fail: false
