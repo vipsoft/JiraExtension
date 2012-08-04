@@ -14,4 +14,4 @@ Copyright (c) 2012 Anthon Pang. See LICENSE for details.
 
 * Anthon Pang [robocoder](http://github.com/robocoder)
 * Konstantin Kudryashov [everzet](http://github.com/everzet) - init.php and build.php
-* Kelin Florian [docteuklein](http://github.com/docteuklein) and Quemener Gildas [gquemener](http://github.com/gquemener) - inspired by GithubExtension
+* Kelin Florian [docteuklein](http://github.com/docteuklein) and Quemener Gildas [gquemener](http://github.com/gquemener) - inspired by [GithubExtension](http://github.com/Behat/GithubExtension)

@@ -42,6 +42,6 @@ class Loader extends AbstractFileLoader
      */
     public function load($resource)
     {
-        return $this->featureLoaderService->load($resouce);
+        return $this->featureLoaderService->load($resource);
     }
 }
