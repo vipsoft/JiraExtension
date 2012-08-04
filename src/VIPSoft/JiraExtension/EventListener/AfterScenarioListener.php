@@ -75,7 +75,7 @@ class AfterScenarioListener implements EventSubscriberInterface
      * @param integer $result Result
      * @param string  $title  Scenario title
      */
-    private function postComment($issue, $result)
+    private function postComment($issue, $result, $title)
     {
         if ($result === StepEvent::PASSED && $this->comment_on_pass) {
             $this->jiraService->postComment($issue, sprintf('Scenario "%s" passed', $title));
