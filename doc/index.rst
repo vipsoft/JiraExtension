@@ -93,6 +93,10 @@ Usage
 
 2. Enter "Summary", e.g., "Feature: Jira integration"
 
+.. note::
+
+   JiraExtension will auto-tag the assignee and fixVersions.
+
 3. Enter "Description" containing the feature, e.g.,
 
 .. code-block:: gherkin
