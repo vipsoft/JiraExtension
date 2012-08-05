@@ -13,6 +13,8 @@ namespace VIPSoft\JiraExtension\Service;
  */
 class JiraService
 {
+    const MAX_ISSUES = 2147483647;
+
     private $host;
     private $user;
     private $password;
@@ -23,10 +25,10 @@ class JiraService
     /**
      * Constructor
      *
-     * @param string $host
-     * @param string $user
-     * @param string $password
-     * @param string $jql
+     * @param string $host     Jira server URL
+     * @param string $user     Jira user ID
+     * @param string $password Jira user password
+     * @param string $jql      JQL query
      */
     public function __construct($host, $user, $password, $jql)
     {
@@ -51,18 +53,36 @@ class JiraService
     }
 
     /**
+     * Get JQL query
+     *
+     * @param integer $timestamp
+     *
+     * @return string
+     */
+    protected function getJql($timestamp)
+    {
+        if (!isset($timestamp)) {
+            return $this->jql;
+        }
+
+        return $this->jql . " AND updated > '" . date('Y-m-d H:i', $timestamp) . "'";
+    }
+
+    /**
      * Fetch issues matching jql and resource
+     *
+     * @param integer $timestamp Optional timestamp for issues updated since the timestamp
      *
      * @return array
      *
      * {@internal the number of results is constrained by jira.search.views.max.limit
      *            and jira.search.views.max.unlimited.group JIRA properties }}
      */
-    public function fetchIssues()
+    public function fetchIssues($timestamp = null)
     {
         $this->connect();
 
-        $issues = $this->soapClient->getIssuesFromJqlSearch($this->token, $this->jql, 2147483647);
+        $issues = $this->soapClient->getIssuesFromJqlSearch($this->token, $this->getJql($timestamp), self::MAX_ISSUES);
 
         return $issues;
     }
@@ -160,5 +180,17 @@ class JiraService
     public function getUrl($id)
     {
         return $this->host . '/browse/' . $id;
+    }
+
+    /**
+     * Does URL match Jira URL?
+     *
+     * @param string $url
+     *
+     * @return boolean
+     */
+    public function urlMatches($url)
+    {
+        return strncmp($url, $this->host, strlen($this->host)) === 0;
     }
 }

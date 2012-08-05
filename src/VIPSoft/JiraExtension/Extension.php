@@ -49,6 +49,10 @@ class Extension implements ExtensionInterface
         if (isset($config['reopen_on_fail'])) {
             $container->setParameter('behat.jira.reopen_on_fail', $config['reopen_on_fail']);
         }
+        if (isset($config['cache_directory'])) {
+            $directory = realpath(rtrim($config['cache_directory'], '/'));
+            $container->setParameter('behat.jira.cache_directory', $directory);
+        }
     }
 
     /**
@@ -78,6 +82,9 @@ class Extension implements ExtensionInterface
                 end()->
                 scalarNode('reopen_on_fail')->
                     defaultFalse()->
+                end()->
+                scalarNode('cache_directory')->
+                    defaultNull()->
                 end()->
             end()->
         end();

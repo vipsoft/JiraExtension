@@ -7,6 +7,7 @@
         <parameter key="behat.jira.loader.class">VIPSoft\JiraExtension\Gherkin\Loader\Loader</parameter>
         <parameter key="behat.jira.service.jira.class">VIPSoft\JiraExtension\Service\JiraService</parameter>
         <parameter key="behat.jira.service.feature_loader.class">VIPSoft\JiraExtension\Service\FeatureLoaderService</parameter>
+        <parameter key="behat.jira.service.file_cache.class">VIPSoft\JiraExtension\Service\FileCacheService</parameter>
         <parameter key="behat.jira.listener.after_scenario.class">VIPSoft\JiraExtension\EventListener\AfterScenarioListener</parameter>
         <parameter key="behat.jira.host"></parameter>
         <parameter key="behat.jira.user"></parameter>
@@ -23,16 +24,21 @@
             <tag name="gherkin.loader" />
         </service>
 
+        <service id="behat.jira.service.feature_loader" class="%behat.jira.service.feature_loader.class%">
+            <argument type="service" id="behat.jira.service.jira" />
+            <argument type="service" id="behat.jira.service.file_cache" />
+            <argument type="service" id="gherkin.parser" />
+        </service>
+
+        <service id="behat.jira.service.file_cache" class="%behat.jira.service.file_cache.class%">
+            <argument type="string">%behat.jira.cache_directory%</argument>
+        </service>
+
         <service id="behat.jira.service.jira" class="%behat.jira.service.jira.class%">
             <argument type="string">%behat.jira.host%</argument>
             <argument type="string">%behat.jira.user%</argument>
             <argument type="string">%behat.jira.password%</argument>
             <argument type="string">%behat.jira.jql%</argument>
-        </service>
-
-        <service id="behat.jira.service.feature_loader" class="%behat.jira.service.feature_loader.class%">
-            <argument type="service" id="behat.jira.service.jira" />
-            <argument type="service" id="gherkin.parser" />
         </service>
 
         <service id="behat.jira.listener.after_scenario" class="%behat.jira.listener.after_scenario.class%">

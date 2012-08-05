@@ -56,6 +56,7 @@ Activate extension in your **behat.yml** and define your Jira connection setting
           comment_on_pass: false
           comment_on_fail: true
           reopen_on_fail: false
+          cache_directory: /tmp/behat-jira
 
 Settings
 --------
@@ -74,6 +75,8 @@ Most of the settings are self-evident.  **jql** is a query (written in JQL) to l
 
 You can be more specific in your search if you create a custom issue type, and use that in the query.
 
+By default caching is disabled.  If a relative path is specified, the cache directory is resolved relative to the current working directory.
+
 Limitations
 -----------
 The number of issues (and hence, features) returned by the SOAP API is constrained by jira.search.views.max.limit and jira.search.views.max.unlimited.group JIRA properties.
@@ -81,6 +84,8 @@ The number of issues (and hence, features) returned by the SOAP API is constrain
 If the Jira user has only read-access to issues, the extension will not be able to comment on the pass/fail of scenarios.
 
 The ability to reopen issues is subject to workflow progression rules.
+
+You should periodically clear the cache as it does not detect issues that may have been deleted or moved, and/or issues that no longer meet the **jql** criteria.
 
 Usage
 =====
@@ -104,6 +109,22 @@ Usage
             When I am loaded by JiraExtension
             Then I should parsed by Gherkin
     {code}
+
+4. Run a specific test, specifying either a URL or a jira: issue "number"
+
+.. code-block:: bash
+
+    bin/behat jira:BDD-1
+
+    bin/behat http://jira.example.com:8080/browse/BDD-1
+
+5. Or run your entire Jira-based feature suite:
+
+    bin/behat http://jira.example.com:8080/
+
+.. note::
+
+   The trailing slash is mandatory.
 
 Copyright
 =========
