@@ -62,7 +62,7 @@ class FeatureLoaderService
     private function parseFeature($issue)
     {
         $body = str_replace(array('{code:none}', '{code}'), '', $issue->description);
-        $url = $this->jiraService->getUrl($issue->key);
+        $url = $this->jiraService->getUrl($issue->key) . '#';
         $feature = $this->gherkinParser->parse($body, $url);
 
         if (isset($issue->assignee)) {
