@@ -57,6 +57,54 @@ Activate extension in your **behat.yml** and define your Jira connection setting
           comment_on_fail: true
           reopen_on_fail: false
 
+Settings
+--------
+Most of the settings are self-evident.  **jql** is a query (written in JQL) to locate Jira issues that contain Behat features.  Example:
+
+.. code-block:: yaml
+
+    # behat-client.yml
+    default:
+      # ...
+      extensions:
+        VIPSoft\JiraExtension\Extension:
+          ...
+          jql: "summary ~ 'Feature'"
+          ...
+
+You can be more specific in your search if you create a custom issue type, and use that in the query.
+
+Limitations
+-----------
+The number of issues (and hence, features) returned by the SOAP API is constrained by jira.search.views.max.limit and jira.search.views.max.unlimited.group JIRA properties.
+
+If the Jira user has only read-access to issues, the extension will not be able to comment on the pass/fail of scenarios.
+
+The ability to reopen issues is subject to workflow progression rules.
+
+Usage
+=====
+1. Create Issue
+
+2. Enter "Summary", e.g., "Feature: Jira integration"
+
+3. Enter "Description" containing the feature, e.g.,
+
+.. code-block:: gherkin
+
+    {code:none}
+    Feature: Jira integration
+        In order to facilitate the authoring of Behat features by non-developers
+        As a developer
+        I want to write an extension to load features from Jira issues.
+
+        Scenario: Load Me!
+            Given I am a Jira issue
+            And I contain a Behat feature
+            When I am loaded by JiraExtension
+            Then I should parsed by Gherkin
+    {code}
+
 Copyright
 =========
 Copyright (c) 2012 Anthon Pang.  See **LICENSE** for details.
