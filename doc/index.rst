@@ -44,7 +44,7 @@ Activate extension in your **behat.yml** and define your Jira connection setting
 
 .. code-block:: yaml
 
-    # behat-client.yml
+    # behat.yml
     default:
       # ...
       extensions:
@@ -64,7 +64,7 @@ Most of the settings are self-evident.  **jql** is a query (written in JQL) to l
 
 .. code-block:: yaml
 
-    # behat-client.yml
+    # behat.yml
     default:
       # ...
       extensions:
