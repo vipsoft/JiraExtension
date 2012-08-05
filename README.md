@@ -1,4 +1,4 @@
-# BehatJiraExtension
+# JiraExtension
 
 Allows Behat to load features from Jira issues
 

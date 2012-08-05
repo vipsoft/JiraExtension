@@ -1,7 +1,7 @@
 {
     "name": "vipsoft/jira-extension",
     "type": "library",
-    "description": "Jira Feature loader for Behat",
+    "description": "Load features for Behat from Jira issues",
     "keywords": ["bdd", "behat", "jira", "feature"],
     "homepage": "http://github.com/vipsoft/",
     "license": "",
