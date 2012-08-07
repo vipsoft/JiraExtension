@@ -6,7 +6,7 @@
 
 namespace VIPSoft\JiraExtension\Tests\Service;
 
-use VIPSoft\JiraExtension\Service\FixtureService;
+use VIPSoft\JiraExtension\Service\JiraService;
 
 /**
  * Jira service test
@@ -17,12 +17,82 @@ use VIPSoft\JiraExtension\Service\FixtureService;
  */
 class JiraServiceTest extends \PHPUnit_Framework_TestCase
 {
+    private $soapClient = null;
+
+    private $jiraService = null;
+
+    public function setUp()
+    {
+        $this->soapClient = $this->getMockFromWsdl(__DIR__.'/Fixtures/jirasoapservice_v2.wsdl');
+
+        $this->jiraService = new JiraService(
+            $this->soapClient,
+            'https://acme.jira.com',
+            'ted',
+            '$ecret',
+            'summary ~ \'Feature\''
+        );
+    }
+
     /**
      * Fetch issues
      */
     public function testFetchIssues()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $expectedIssues = array(
+            (object) array('id' => 'JIRA-12'),
+            (object) array('id' => 'JIRA-13')
+        );
+
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->once())
+            ->method('getIssuesFromJqlSearch')
+            ->with('AUTH_TOKEN', 'summary ~ \'Feature\'', $this->anything())
+            ->will($this->returnValue($expectedIssues));
+
+        $issues = $this->jiraService->fetchIssues();
+
+        $this->assertSame($expectedIssues, $issues);
+    }
+
+    public function testFetchIssuesWithTimestamp()
+    {
+        $timestamp = 1344329723;
+        $expectedIssues = (object) array(
+            (object) array('id' => 'JIRA-12'),
+            (object) array('id' => 'JIRA-13')
+        );
+
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->once())
+            ->method('getIssuesFromJqlSearch')
+            ->with('AUTH_TOKEN', 'summary ~ \'Feature\' AND updated > \''.date('Y-m-d H:i', $timestamp).'\'', $this->anything())
+            ->will($this->returnValue($expectedIssues));
+
+        $issues = $this->jiraService->fetchIssues($timestamp);
+
+        $this->assertSame($expectedIssues, $issues);
+    }
+
+    public function testThatLoginIsOnlyCalledOnce()
+    {
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->exactly(2))
+            ->method('getIssuesFromJqlSearch');
+
+        $this->jiraService->fetchIssues();
+        $this->jiraService->fetchIssues();
     }
 
     /**
@@ -30,7 +100,21 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testFetchIssue()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $expectedIssue = (object) array('id' => 'JIRA-12');
+
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->once())
+            ->method('getIssue')
+            ->with('AUTH_TOKEN', 'JIRA-12')
+            ->will($this->returnValue($expectedIssue));
+
+        $issue = $this->jiraService->fetchIssue('JIRA-12');
+
+        $this->assertSame($expectedIssue, $issue);
     }
 
     /**
@@ -38,15 +122,69 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testPostComment()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->once())
+            ->method('addComment')
+            ->with('AUTH_TOKEN', 'JIRA-12', array('body' => 'Message.'));
+
+        $this->jiraService->postComment('JIRA-12', 'Message.');
     }
 
     /**
      * Reopen issue
+     *
+     * @dataProvider provideReopenIssues
      */
-    public function testReopenIssue()
+    public function testReopenIssue($expectedActionId, $issues)
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->once())
+            ->method('getAvailableActions')
+            ->will($this->returnValue($issues));
+
+        $this->soapClient->expects($this->once())
+            ->method('progressWorkflowAction')
+            ->with('AUTH_TOKEN', 'JIRA-12', $expectedActionId, array());
+
+        $this->jiraService->reopenIssue('JIRA-12');
+    }
+
+    /**
+     * @return array
+     */
+    public function provideReopenIssues()
+    {
+        return array(
+            array(3, array((object) array('id' => 2, 'name' => 'Delete Issue'), (object) array('id' => 3, 'name' => 'Reopen Issue'))),
+            array(3, array((object) array('id' => 3, 'name' => 'Reopen issue'))),
+            array(4, array((object) array('id' => 4, 'name' => 'Reopen'))),
+            array(5, array((object) array('id' => 5, 'name' => 'reopen')))
+        );
+    }
+
+    public function testThatReopenIssueIsNotCalledIfTransitionIsNotAvailable()
+    {
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->once())
+            ->method('getAvailableActions')
+            ->will($this->returnValue(array((object) array('id' => 3, 'name' => 'Delete Issue'))));
+
+        $this->soapClient->expects($this->never())
+            ->method('progressWorkflowAction');
+
+        $this->jiraService->reopenIssue('JIRA-12');
     }
 
     /**
@@ -54,7 +192,19 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetIssue()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $id = $this->jiraService->getIssue('https://acme.jira.com/browse/JIRA-12');
+
+        $this->assertEquals('JIRA-12', $id);
+    }
+
+    /**
+     * Get issue
+     */
+    public function testGetIssueForUnknownResource()
+    {
+        $id = $this->jiraService->getIssue('https://badger.jira.com/browse/JIRA-12');
+
+        $this->assertNull($id);
     }
 
     /**
@@ -62,7 +212,9 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUrl()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $url = $this->jiraService->getUrl('JIRA-12');
+
+        $this->assertEquals('https://acme.jira.com/browse/JIRA-12', $url);
     }
 
     /**
@@ -70,6 +222,7 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testUrlMatches()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $this->assertTrue($this->jiraService->urlMatches('https://acme.jira.com/browser/JIRA-12'));
+        $this->assertFalse($this->jiraService->urlMatches('https://badger.jira.com/browser/JIRA-12'));
     }
 }
