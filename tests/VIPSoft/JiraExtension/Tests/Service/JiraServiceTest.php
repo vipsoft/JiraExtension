@@ -40,8 +40,8 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
     public function testFetchIssues()
     {
         $expectedIssues = array(
-            (object) array('id' => 'JIRA-12'),
-            (object) array('id' => 'JIRA-13')
+            (object) array('id' => '12'),
+            (object) array('id' => '13')
         );
 
         $this->soapClient->expects($this->once())
@@ -63,8 +63,8 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
     {
         $timestamp = 1344329723;
         $expectedIssues = (object) array(
-            (object) array('id' => 'JIRA-12'),
-            (object) array('id' => 'JIRA-13')
+            (object) array('id' => '12'),
+            (object) array('id' => '13')
         );
 
         $this->soapClient->expects($this->once())
@@ -100,7 +100,7 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testFetchIssue()
     {
-        $expectedIssue = (object) array('id' => 'JIRA-12');
+        $expectedIssue = (object) array('id' => '12');
 
         $this->soapClient->expects($this->once())
             ->method('login')
@@ -192,9 +192,9 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetIssue()
     {
-        $id = $this->jiraService->getIssue('https://acme.jira.com/browse/JIRA-12');
+        $key = $this->jiraService->getIssue('https://acme.jira.com/browse/JIRA-12');
 
-        $this->assertEquals('JIRA-12', $id);
+        $this->assertEquals('JIRA-12', $key);
     }
 
     /**
@@ -202,9 +202,9 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetIssueForUnknownResource()
     {
-        $id = $this->jiraService->getIssue('https://badger.jira.com/browse/JIRA-12');
+        $key = $this->jiraService->getIssue('https://badger.jira.com/browse/JIRA-12');
 
-        $this->assertNull($id);
+        $this->assertNull($key);
     }
 
     /**
