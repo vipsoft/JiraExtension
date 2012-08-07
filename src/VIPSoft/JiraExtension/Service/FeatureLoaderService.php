@@ -9,8 +9,6 @@ namespace VIPSoft\JiraExtension\Service;
 use Behat\Gherkin\Node\FeatureNode,
     Behat\Gherkin\Parser;
 
-use VIPSoft\JiraExtension\Service\FeatureLoaderService;
-
 /**
  * Feature Loader service
  *
@@ -109,7 +107,7 @@ class FeatureLoaderService
      *
      * @return array
      */
-    public function createFeature($issue)
+    private function createFeature($issue)
     {
         $issue = $this->jiraService->fetchIssue($issue);
         $feature = $this->parseFeature($issue);
