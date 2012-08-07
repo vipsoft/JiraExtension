@@ -6,7 +6,7 @@
 
 namespace VIPSoft\JiraExtension\Tests\Service;
 
-use VIPSoft\JiraExtension\Service\FixtureService;
+use VIPSoft\JiraExtension\Service\FileCacheService;
 
 /**
  * File cache service test
@@ -17,51 +17,100 @@ use VIPSoft\JiraExtension\Service\FixtureService;
  */
 class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * __destruct()
-     */
-    public function testDestruct()
+    private $cacheDirectory = null;
+
+    public function setUp()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $this->cacheDirectory = '/tmp/filecacheservicetest'.date('YmdHis');
     }
 
-    /**
-     * Get keys
-     */
+    public function tearDown()
+    {
+        if (!is_dir($this->cacheDirectory)){
+            return;
+        }
+
+        $dir = new \DirectoryIterator($this->cacheDirectory);
+
+        foreach ($dir as $fileInfo) {
+            if (!$fileInfo->isDot()) {
+                unlink($fileInfo->getRealPath());
+            }
+        }
+
+        rmdir($this->cacheDirectory);
+    }
+
+    public function testThatMetadataIsStoredInCache()
+    {
+        $fileCache = new FileCacheService($this->cacheDirectory);
+        $fileCache->write('foo', 'bar', 1344344336);
+
+        unset($fileCache);
+
+        $this->assertFileExists($this->cacheDirectory.'/cache.meta');
+    }
+
+    public function testThatMetadataIsNotStoredIfNoDataIsCached()
+    {
+        $fileCache = new FileCacheService($this->cacheDirectory);
+
+        unset($fileCache);
+
+        $this->assertFileNotExists($this->cacheDirectory.'/cache.meta');
+    }
+
     public function testGetKeys()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $fileCache = new FileCacheService($this->cacheDirectory);
+        $fileCache->write('foo', 'content', 1344344331);
+        $fileCache->write('bar', 'content', 1344344353);
+
+        $this->assertEquals(array('foo', 'bar'), $fileCache->getKeys());
     }
 
     /**
-     * Convert to Unix timestamp
+     * @dataProvider provideDates
      */
-    public function testConvertToUnixTimestamp()
+    public function testConvertToUnixTimestamp($date, $expectedTimestamp)
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $fileCache = new FileCacheService($this->cacheDirectory);
+
+        $timestamp = $fileCache->convertToUnixTimestamp($date);
+
+        $this->assertEquals($expectedTimestamp, $timestamp);
     }
 
-    /**
-     * Get latest timestamp
-     */
+    public function provideDates()
+    {
+        return array(
+            array('2011-05-11T18:51:30+00:00', 1305139890),
+            array('2011-05-11T18:51:30+01:00', 1305136290),
+            array('2011-05-11T18:51:30Z', 1305139890)
+        );
+    }
+
     public function testGetLatestTimestamp()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $fileCache = new FileCacheService($this->cacheDirectory);
+        $fileCache->write('foo', 'content', 1344344331);
+        $fileCache->write('bar', 'content', 1344344353);
+        $fileCache->write('baz', 'content', 1344344342);
+
+        $this->assertEquals(1344344353, $fileCache->getLatestTimestamp());
     }
 
-    /**
-     * Read
-     */
-    public function testRead()
+    public function testThatDataCanBeRetrievedByAnotherCacheInstance()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
-    }
+        $fileCache = new FileCacheService($this->cacheDirectory);
+        $fileCache->write('foo', 'content 1', 1344344331);
+        $fileCache->write('bar', 'content 2', 1344344353);
 
-    /**
-     * Write
-     */
-    public function testWrite()
-    {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        unset($fileCache);
+
+        $fileCache = new FileCacheService($this->cacheDirectory);
+
+        $this->assertEquals('content 1', $fileCache->read('foo'));
+        $this->assertEquals('content 2', $fileCache->read('bar'));
     }
 }

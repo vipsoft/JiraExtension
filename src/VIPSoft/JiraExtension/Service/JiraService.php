@@ -15,36 +15,52 @@ class JiraService
 {
     const MAX_ISSUES = 2147483647;
 
-    private $soapClientClass;
-    private $host;
-    private $user;
-    private $password;
-    private $jql;
+    /**
+     * @var \SoapClient $soapClient
+     */
     private $soapClient;
+
+    /**
+     * @var string $host
+     */
+    private $host;
+
+    /**
+     * @var string $user
+     */
+    private $user;
+
+    /**
+     * @var string $password
+     */
+    private $password;
+
+    /**
+     * @var string $jql
+     */
+    private $jql;
+
+    /**
+     * @var string $token
+     */
     private $token;
 
     /**
      * Constructor
      *
-     * @param string $soapClientClass SOAP client class name
-     * @param string $host            Jira server base URL
-     * @param string $user            Jira user ID
-     * @param string $password        Jira user password
-     * @param string $jql             JQL query
-     * @param string $wsdlUrl         WSDL URL
+     * @param \SoapClient $soapClient SOAP client class name
+     * @param string      $host       Jira server base URL
+     * @param string      $user       Jira user ID
+     * @param string      $password   Jira user password
+     * @param string      $jql        JQL query
      */
-    public function __construct($soapClientClass, $host, $user, $password, $jql, $wsdlUrl)
+    public function __construct(\SoapClient $soapClient, $host, $user, $password, $jql)
     {
-        if (substr($soapClientClass, 0, 1) !== '\\') {
-            $soapClientClass = '\\' . $soapClientClass;
-        }
-
-        $this->soapClientClass = $soapClientClass;
+        $this->soapClient = $soapClient;
         $this->host = $host;
         $this->user = $user;
         $this->password = $password;
         $this->jql = $jql;
-        $this->wsdlUrl = $wsdlUrl;
     }
 
     /**
@@ -52,13 +68,10 @@ class JiraService
      */
     private function connect()
     {
-        if ($this->soapClient) {
+        if (!empty($this->token)) {
             return;
         }
 
-        $class = $this->soapClientClass;
-
-        $this->soapClient = new $class($this->host . $this->wsdlUrl, array('trace'=>true));
         $this->token = $this->soapClient->login($this->user, $this->password);
     }
 
@@ -102,7 +115,7 @@ class JiraService
      *
      * @param string $id Issue key
      *
-     * @return string
+     * @return \stdClass
      */
     public function fetchIssue($id)
     {
