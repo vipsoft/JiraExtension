@@ -147,9 +147,9 @@ class FileCacheService
     /**
      * Write content to cache
      *
-     * @param string  $key
-     * @param mixed   $content
-     * @param integer $timestamp
+     * @param string  $key       Cache key
+     * @param mixed   $content   Content
+     * @param integer $timestamp Unix timestamp
      */
     public function write($key, $content, $timestamp = null)
     {

@@ -20,24 +20,24 @@ use VIPSoft\JiraExtension\Service\JiraService;
  */
 class AfterScenarioListener implements EventSubscriberInterface
 {
-    private $comment_on_pass;
-    private $comment_on_fail;
-    private $reopen_on_fail;
+    private $commentOnPass;
+    private $commentOnFail;
+    private $reopenOnFail;
     private $jiraService;
 
     /**
      * Constructor
      *
-     * @param boolean     $comment_on_pass Post comment when scenario passes
-     * @param boolean     $comment_on_fail Post comment when scenario fails
-     * @param boolean     $reopen_on_fail  Reopen issue when scenario fails
-     * @param JiraService $jiraService Jira service
+     * @param boolean     $commentOnPass Post comment when scenario passes
+     * @param boolean     $commentOnFail Post comment when scenario fails
+     * @param boolean     $reopenOnFail  Reopen issue when scenario fails
+     * @param JiraService $jiraService   Jira service
      */
-    public function __construct($comment_on_pass, $comment_on_fail, $reopen_on_fail, $jiraService)
+    public function __construct($commentOnPass, $commentOnFail, $reopenOnFail, $jiraService)
     {
-        $this->comment_on_pass = $comment_on_pass;
-        $this->comment_on_fail = $comment_on_fail;
-        $this->reopen_on_fail = $reopen_on_fail;
+        $this->commentOnPass = $commentOnPass;
+        $this->commentOnFail = $commentOnFail;
+        $this->reopenOnFail = $reopenOnFail;
         $this->jiraService = $jiraService;
     }
 
@@ -77,9 +77,9 @@ class AfterScenarioListener implements EventSubscriberInterface
      */
     private function postComment($issue, $result, $title)
     {
-        if ($result === StepEvent::PASSED && $this->comment_on_pass) {
+        if ($result === StepEvent::PASSED && $this->commentOnPass) {
             $this->jiraService->postComment($issue, sprintf('Scenario "%s" passed', $title));
-        } elseif ($result === StepEvent::FAILED && $this->comment_on_fail) {
+        } elseif ($result === StepEvent::FAILED && $this->commentOnFail) {
             $this->jiraService->postComment($issue, sprintf('Scenario "%s" failed', $title));
         }
     }
@@ -92,7 +92,7 @@ class AfterScenarioListener implements EventSubscriberInterface
      */
     private function updateIssue($issue, $result)
     {
-        if ($result === StepEvent::FAILED && $this->reopen_on_fail) {
+        if ($result === StepEvent::FAILED && $this->reopenOnFail) {
             $this->jiraService->reopenIssue($issue);
         }
     }

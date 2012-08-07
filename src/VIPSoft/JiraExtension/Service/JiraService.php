@@ -15,6 +15,7 @@ class JiraService
 {
     const MAX_ISSUES = 2147483647;
 
+    private $soapClientClass;
     private $host;
     private $user;
     private $password;
@@ -25,17 +26,25 @@ class JiraService
     /**
      * Constructor
      *
-     * @param string $host     Jira server URL
-     * @param string $user     Jira user ID
-     * @param string $password Jira user password
-     * @param string $jql      JQL query
+     * @param string $soapClientClass SOAP client class name
+     * @param string $host            Jira server base URL
+     * @param string $user            Jira user ID
+     * @param string $password        Jira user password
+     * @param string $jql             JQL query
+     * @param string $wsdlUrl         WSDL URL
      */
-    public function __construct($host, $user, $password, $jql)
+    public function __construct($soapClientClass, $host, $user, $password, $jql, $wsdlUrl)
     {
+        if (substr($soapClientClass, 0, 1) !== '\\') {
+            $soapClientClass = '\\' . $soapClientClass;
+        }
+
+        $this->soapClientClass = $soapClientClass;
         $this->host = $host;
         $this->user = $user;
         $this->password = $password;
         $this->jql = $jql;
+        $this->wsdlUrl = $wsdlUrl;
     }
 
     /**
@@ -47,8 +56,9 @@ class JiraService
             return;
         }
 
-        $wsdl = $this->host . '/rpc/soap/jirasoapservice-v2?wsdl';
-        $this->soapClient = new \SoapClient($wsdl, array('trace'=>true));
+        $class = $this->soapClientClass;
+
+        $this->soapClient = new $class($this->host . $this->wsdlUrl, array('trace'=>true));
         $this->token = $this->soapClient->login($this->user, $this->password);
     }
 

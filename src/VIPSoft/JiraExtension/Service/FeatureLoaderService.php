@@ -124,9 +124,6 @@ class FeatureLoaderService
     /**
      * Create features from issues
      *
-     * @param array $issues
-     * @param array $keys
-     *
      * @return array
      */
     private function createFeatures()

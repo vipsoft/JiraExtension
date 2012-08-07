@@ -35,10 +35,12 @@
         </service>
 
         <service id="behat.jira.service.jira" class="%behat.jira.service.jira.class%">
+            <argument type="string">SoapClient</argument>
             <argument type="string">%behat.jira.host%</argument>
             <argument type="string">%behat.jira.user%</argument>
             <argument type="string">%behat.jira.password%</argument>
             <argument type="string">%behat.jira.jql%</argument>
+            <argument type="string">/rpc/soap/jirasoapservice-v2?wsdl</argument>
         </service>
 
         <service id="behat.jira.listener.after_scenario" class="%behat.jira.listener.after_scenario.class%">

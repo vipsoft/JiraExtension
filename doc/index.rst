@@ -130,6 +130,10 @@ Usage
 
    The trailing slash is mandatory.
 
+Source
+======
+`Github <https://github.com/vipsoft/JiraExtension>`_
+
 Copyright
 =========
 Copyright (c) 2012 Anthon Pang.  See **LICENSE** for details.
@@ -137,3 +141,4 @@ Copyright (c) 2012 Anthon Pang.  See **LICENSE** for details.
 Contributors
 ============
 * Anthon Pang `(robocoder) <http://github.com/robocoder>`_
+* `Others <https://github.com/vipsoft/JiraExtension/graphs/contributors>`_
