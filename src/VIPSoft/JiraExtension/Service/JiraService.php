@@ -48,11 +48,11 @@ class JiraService
     /**
      * Constructor
      *
-     * @param \SoapClient $soapClientClass SOAP client class name
-     * @param string      $host            Jira server base URL
-     * @param string      $user            Jira user ID
-     * @param string      $password        Jira user password
-     * @param string      $jql             JQL query
+     * @param \SoapClient $soapClient SOAP client class name
+     * @param string      $host       Jira server base URL
+     * @param string      $user       Jira user ID
+     * @param string      $password   Jira user password
+     * @param string      $jql        JQL query
      */
     public function __construct(\SoapClient $soapClient, $host, $user, $password, $jql)
     {
