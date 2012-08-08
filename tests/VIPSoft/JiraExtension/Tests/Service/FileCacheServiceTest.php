@@ -13,6 +13,7 @@ use VIPSoft\JiraExtension\Service\FileCacheService;
  *
  * @group Service
  *
+ * @author Jakub Zalas <jakub@zalas.pl>
  * @author Anthon Pang <apang@softwaredevelopment.ca>
  */
 class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
@@ -86,7 +87,9 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
         return array(
             array('2011-05-11T18:51:30+00:00', 1305139890),
             array('2011-05-11T18:51:30+01:00', 1305136290),
-            array('2011-05-11T18:51:30Z', 1305139890)
+            array('2011-05-11T18:51:30Z', 1305139890),
+            array('2011-05-11T17:51:30-01:00', 1305139890),
+            array('2011-05-11T18:51:30.500+00:00', 1305139890),
         );
     }
 

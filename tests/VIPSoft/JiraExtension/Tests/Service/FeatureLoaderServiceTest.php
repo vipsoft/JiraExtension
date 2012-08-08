@@ -13,7 +13,7 @@ use VIPSoft\JiraExtension\Service\FeatureLoaderService;
  *
  * @group Service
  *
- * @author Anthon Pang <apang@softwaredevelopment.ca>
+ * @author Jakub Zalas <jakub@zalas.pl>
  */
 class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
 {

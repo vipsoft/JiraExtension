@@ -141,4 +141,5 @@ Copyright (c) 2012 Anthon Pang.  See **LICENSE** for details.
 Contributors
 ============
 * Anthon Pang `(robocoder) <http://github.com/robocoder>`_
+* Jakub Zalas `(jakzal) <https://github.com/jakzal>`_
 * `Others <https://github.com/vipsoft/JiraExtension/graphs/contributors>`_

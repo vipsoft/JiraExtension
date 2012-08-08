@@ -13,7 +13,7 @@ use VIPSoft\JiraExtension\Service\JiraService;
  *
  * @group Service
  *
- * @author Anthon Pang <apang@softwaredevelopment.ca>
+ * @author Jakub Zalas <jakub@zalas.pl>
  */
 class JiraServiceTest extends \PHPUnit_Framework_TestCase
 {
