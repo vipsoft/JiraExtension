@@ -14,6 +14,7 @@ use VIPSoft\JiraExtension\Service\FeatureLoaderService;
  * @group Service
  *
  * @author Jakub Zalas <jakub@zalas.pl>
+ * @author Anthon Pang <apang@softwaredevelopment.ca>
  */
 class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -218,6 +219,38 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadingMultipleFeatures()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $url = 'https://acme.jira.com/browse/';
+
+        $this->jiraService->expects($this->exactly(2))
+            ->method('getUrl')
+            ->will($this->onConsecutiveCalls($url . '13', $url . '14'));
+
+        $this->jiraService->expects($this->once())
+            ->method('fetchIssues')
+            ->will($this->returnValue(array(
+                (object) array(
+                    'id' => 2034,
+                    'description' => '{code}As a Developer I want to load features from Jira{code}',
+                    'key' => 'BDD-13',
+                    'updated' => 0,
+                ),
+                (object) array(
+                    'id' => 2035,
+                    'description' => '{code}As a Developer I want to load features from Jira{code}',
+                    'key' => 'BDD-14',
+                    'updated' => 0,
+                ),
+            )));
+
+        $this->gherkinParser->expects($this->exactly(2))
+            ->method('parse')
+            ->will($this->returnValue($this->getMock('Behat\Gherkin\Node\FeatureNode')));
+
+        $issues = $this->featureLoader->load('');
+
+        $this->assertInternalType('array', $issues);
+        $this->assertCount(2, $issues);
+        $this->assertInstanceOf('Behat\Gherkin\Node\FeatureNode', $issues['BDD-13']);
+        $this->assertInstanceOf('Behat\Gherkin\Node\FeatureNode', $issues['BDD-14']);
     }
 }
