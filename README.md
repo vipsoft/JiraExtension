@@ -4,7 +4,7 @@ Allows Behat to load features from Jira issues
 
 ## Documentation
 
-[Official documentation](http://extensions.behat.org/jira/index.html)
+[Official documentation](http://extensions.behat.org/jira-extension/)
 
 ## Source
 
