@@ -195,6 +195,10 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
         $key = $this->jiraService->getIssue('https://acme.jira.com/browse/JIRA-12');
 
         $this->assertEquals('JIRA-12', $key);
+
+        $key = $this->jiraService->getIssue('https://acme.jira.com/browse/JIRA-12#anchor');
+
+        $this->assertEquals('JIRA-12', $key);
     }
 
     /**

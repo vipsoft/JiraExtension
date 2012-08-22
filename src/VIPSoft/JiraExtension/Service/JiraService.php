@@ -186,6 +186,11 @@ class JiraService
      */
     public function getIssue($resource)
     {
+        $hashPosition = strpos($resource, '#');
+        if ($hashPosition !== false) {
+            $resource = substr($resource, 0, $hashPosition);
+        }
+
         $url = $this->host . '/browse/';
 
         if (strncmp($resource, $url, strlen($url)) === 0) {

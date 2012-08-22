@@ -59,10 +59,9 @@ class AfterScenarioListener implements EventSubscriberInterface
         $scenario = $event->getScenario();
         $feature = $scenario->getFeature();
         $url = $feature->getFile();
+        $issue = $this->jiraService->getIssue($url);
 
-        if ($this->jiraService->getIssue($url)) {
-            $issue = $this->jiraService->getIssue($url);
-
+        if ($issue) {
             $this->postComment($issue, $event->getResult(), $scenario->getTitle());
             $this->updateIssue($issue, $event->getResult());
         }
