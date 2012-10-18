@@ -41,7 +41,7 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('parse'))
             ->getMock();
 
-        $this->featureLoader = new FeatureLoaderService($this->jiraService, $this->cacheService, $this->gherkinParser);
+        $this->featureLoader = new FeatureLoaderService($this->jiraService, $this->cacheService, $this->gherkinParser, 'description');
     }
 
     public function testThatResourceIsOptional()
@@ -252,5 +252,67 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $issues);
         $this->assertInstanceOf('Behat\Gherkin\Node\FeatureNode', $issues['BDD-13']);
         $this->assertInstanceOf('Behat\Gherkin\Node\FeatureNode', $issues['BDD-14']);
+    }
+    
+    /**
+     * Make private and protected function callable
+     * 
+     * @param string $function
+     * 
+     * @return \ReflectionMethod
+     */
+    public function makeTestable($function)
+    {
+        $method = new \ReflectionMethod($this->featureLoader, $function);
+        $method->setAccessible(true);
+    
+        return $method;
+    }
+    
+    /**
+     * Sets the given property to given value on Object in Test
+     * 
+     * @param string $name
+     * 
+     * @param mixed $value
+     */
+    public function setPropertyOnObject($name, $value)
+    {
+        $property = new \ReflectionProperty($this->featureLoader, $name);
+        $property->setAccessible(true);
+        $property->setValue($this->featureLoader, $value);
+    }
+    
+    public function testGetFeatureWithDefaultField()
+    {
+        $issue = (object) array(
+            'description' => '{code}foobar{code}'
+        );
+        
+        $this->setPropertyOnObject('featureField', 'description');
+        
+        $method = $this->makeTestable('getFeature');
+        $result = $method->invoke($this->featureLoader, $issue);
+        
+        $this->assertEquals('foobar', $result);
+    }
+    
+    public function testGetFeatureWithCustomField()
+    {
+        $issue = (object) array(
+            'customFieldValues' => array(
+                (object)array(
+                    'customfieldId' => 'foo',
+                    'values' => array('{code}foobar{code}')
+                )
+            )
+        );
+        
+        $this->setPropertyOnObject('featureField', 'foo');
+        
+        $method = $this->makeTestable('getFeature');
+        $result = $method->invoke($this->featureLoader, $issue);
+        
+        $this->assertEquals('foobar', $result);
     }
 }

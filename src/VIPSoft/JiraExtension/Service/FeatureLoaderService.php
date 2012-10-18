@@ -19,19 +19,22 @@ class FeatureLoaderService
     private $jiraService;
     private $cacheService;
     private $gherkinParser;
-
+    private $featureField;
+    
     /**
      * Constructor
      *
      * @param JiraService  $jiraService   Jira service
      * @param CacheService $cacheService  Cache service
      * @param Parser       $gherkinParser Gherkin parser
+     * @param string       $featureField  Field in Jira
      */
-    public function __construct($jiraService, $cacheService, $gherkinParser)
+    public function __construct($jiraService, $cacheService, $gherkinParser, $featureField)
     {
         $this->jiraService = $jiraService;
         $this->cacheService = $cacheService;
         $this->gherkinParser = $gherkinParser;
+        $this->featureField = $featureField;
     }
 
     /**
@@ -59,7 +62,7 @@ class FeatureLoaderService
      */
     private function parseFeature($issue)
     {
-        $body = str_replace(array('{code:none}', '{code}'), '', $issue->description);
+        $body = $this->getFeature($issue);
         $url = $this->jiraService->getUrl($issue->key) . '#';
         $feature = $this->gherkinParser->parse($body, $url);
 
@@ -74,6 +77,43 @@ class FeatureLoaderService
         }
 
         return $feature;
+    }
+    
+    /**
+     * Gets the feature from the defined field
+     * 
+     * @param \stdClass $issue
+     * 
+     * @return string
+     */
+    private function getFeature($issue)
+    {
+        $arrayIssue = (array)$issue;
+        
+        if (array_key_exists($this->featureField, $arrayIssue)) {
+            return $this->extractFeatureFromString($arrayIssue[$this->featureField]);
+        }
+        
+        $customFields = $arrayIssue['customFieldValues'];
+        foreach ($customFields as $customField) {
+            if ($this->featureField == $customField->customfieldId) {
+                $value = current($customField->values);
+                return $this->extractFeatureFromString($value);
+            }
+        }
+        
+        return '';
+    }
+    
+    /**
+     * Extracts a Feature between code block from a given string
+     * 
+     * @param string $feature
+     * 
+     * @return string
+     */
+    private function extractFeatureFromString($feature) {
+        return preg_replace('/\{code.*?\}(.+?)\{code\}/s', '$1', $feature);
     }
 
     /**
