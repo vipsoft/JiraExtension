@@ -19,7 +19,7 @@ class FeatureLoaderService
     private $jiraService;
     private $cacheService;
     private $gherkinParser;
-	private $featureField;
+    private $featureField;
     
     /**
      * Constructor
@@ -27,7 +27,7 @@ class FeatureLoaderService
      * @param JiraService  $jiraService   Jira service
      * @param CacheService $cacheService  Cache service
      * @param Parser       $gherkinParser Gherkin parser
-     * @param String       $featureField  Field in Jira
+     * @param string       $featureField  Field in Jira
      */
     public function __construct($jiraService, $cacheService, $gherkinParser, $featureField)
     {
@@ -62,7 +62,7 @@ class FeatureLoaderService
      */
     private function parseFeature($issue)
     {
-    	$body = $this->getFeature($issue);
+        $body = $this->getFeature($issue);
         $url = $this->jiraService->getUrl($issue->key) . '#';
         $feature = $this->gherkinParser->parse($body, $url);
 
@@ -80,30 +80,40 @@ class FeatureLoaderService
     }
     
     /**
-     * Gets the feature from the definded field
+     * Gets the feature from the defined field
      * 
-     * @param \StdClass $issue
+     * @param \stdClass $issue
      * 
-     * @return String
+     * @return string
      */
     private function getFeature($issue)
     {
-    	$arrayIssue = (array)$issue;
-    	$value = '';
-    	if (array_key_exists($this->featureField, $arrayIssue)) {
-    		$value = $arrayIssue[$this->featureField];
-    	} else {
-    		$customFields = $arrayIssue['customFieldValues'];
-    		foreach ($customFields as $customField) {
-    			if ($this->featureField == $customField->customfieldId) {
-    				$value = array_shift($customField->values);
-    			}
-    		}
-    	}
-    	
-    	$feature = preg_replace('/\{code.*?\}(.+?)\{code\}/s', '$1', $value);
-    	
-    	return $feature;
+        $arrayIssue = (array)$issue;
+        
+        if (array_key_exists($this->featureField, $arrayIssue)) {
+            return $this->extractFeatureFromString($arrayIssue[$this->featureField]);
+        }
+        
+        $customFields = $arrayIssue['customFieldValues'];
+        foreach ($customFields as $customField) {
+            if ($this->featureField == $customField->customfieldId) {
+                $value = current($customField->values);
+                return $this->extractFeatureFromString($value);
+            }
+        }
+        
+        return '';
+    }
+    
+    /**
+     * Extracts a Feature between code block from a given string
+     * 
+     * @param string $feature
+     * 
+     * @return string
+     */
+    private function extractFeatureFromString($feature) {
+        return preg_replace('/\{code.*?\}(.+?)\{code\}/s', '$1', $feature);
     }
 
     /**
