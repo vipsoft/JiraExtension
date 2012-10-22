@@ -14,6 +14,7 @@ use VIPSoft\JiraExtension\Service\JiraService;
  * @group Service
  *
  * @author Jakub Zalas <jakub@zalas.pl>
+ * @author Pascal Rehfeldt <Pascal@Pascal-Rehfeldt.com>
  */
 class JiraServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +22,10 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
 
     private $jiraService = null;
 
-    public function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
     {
         $this->soapClient = $this->getMockFromWsdl(__DIR__.'/Fixtures/jirasoapservice_v2.wsdl');
 
@@ -59,6 +63,9 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedIssues, $issues);
     }
 
+    /**
+     * Fetch issues with timestamp
+     */
     public function testFetchIssuesWithTimestamp()
     {
         $timestamp = 1344329723;
@@ -82,6 +89,9 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedIssues, $issues);
     }
 
+    /**
+     * Test login is only called once
+     */
     public function testThatLoginIsOnlyCalledOnce()
     {
         $this->soapClient->expects($this->once())
@@ -137,6 +147,9 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * Reopen issue
      *
+     * @param integer $expectedActionId Expected action ID
+     * @param array   $issues           Issues
+     *
      * @dataProvider provideReopenIssues
      */
     public function testReopenIssue($expectedActionId, $issues)
@@ -170,6 +183,9 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Test reopen issue is not called if workflow transition is not available
+     */
     public function testThatReopenIssueIsNotCalledIfTransitionIsNotAvailable()
     {
         $this->soapClient->expects($this->once())

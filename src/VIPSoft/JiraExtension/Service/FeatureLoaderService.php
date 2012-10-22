@@ -13,6 +13,7 @@ use Behat\Gherkin\Node\FeatureNode,
  * Feature Loader service
  *
  * @author Anthon Pang <apang@softwaredevelopment.ca>
+ * @author Pascal Rehfeldt <Pascal@Pascal-Rehfeldt.com>
  */
 class FeatureLoaderService
 {
@@ -88,7 +89,7 @@ class FeatureLoaderService
      */
     private function getFeature($issue)
     {
-        $arrayIssue = (array)$issue;
+        $arrayIssue = (array) $issue;
 
         if (array_key_exists($this->featureField, $arrayIssue)) {
             return $this->extractFeatureFromString($arrayIssue[$this->featureField]);
@@ -98,6 +99,7 @@ class FeatureLoaderService
         foreach ($customFields as $customField) {
             if ($this->featureField == $customField->customfieldId) {
                 $value = current($customField->values);
+
                 return $this->extractFeatureFromString($value);
             }
         }
@@ -112,7 +114,8 @@ class FeatureLoaderService
      *
      * @return string
      */
-    private function extractFeatureFromString($feature) {
+    private function extractFeatureFromString($feature)
+    {
         return preg_replace('/\{code.*?\}(.+?)\{code\}/s', '$1', $feature);
     }
 
