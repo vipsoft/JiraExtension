@@ -20,14 +20,20 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
 {
     private $cacheDirectory = null;
 
-    public function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
     {
         $this->cacheDirectory = '/tmp/filecacheservicetest'.date('YmdHis');
     }
 
-    public function tearDown()
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
     {
-        if (!is_dir($this->cacheDirectory)){
+        if (!is_dir($this->cacheDirectory)) {
             return;
         }
 
@@ -42,6 +48,9 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
         rmdir($this->cacheDirectory);
     }
 
+    /**
+     * Test that metadata is stored in cache
+     */
     public function testThatMetadataIsStoredInCache()
     {
         $fileCache = new FileCacheService($this->cacheDirectory);
@@ -52,6 +61,9 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($this->cacheDirectory.'/cache.meta');
     }
 
+    /**
+     * Test that metadata is not stored if no data is cached
+     */
     public function testThatMetadataIsNotStoredIfNoDataIsCached()
     {
         $fileCache = new FileCacheService($this->cacheDirectory);
@@ -61,6 +73,9 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertFileNotExists($this->cacheDirectory.'/cache.meta');
     }
 
+    /**
+     * Test getKeys()
+     */
     public function testGetKeys()
     {
         $fileCache = new FileCacheService($this->cacheDirectory);
@@ -71,6 +86,11 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test convertToUnixTimestamp()
+     *
+     * @param string  $date              Date (YYYY-MM-DDTHH:MM:SS+HH:MM)
+     * @param integer $expectedTimestamp Expected timestamp
+     *
      * @dataProvider provideDates
      */
     public function testConvertToUnixTimestamp($date, $expectedTimestamp)
@@ -82,6 +102,11 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedTimestamp, $timestamp);
     }
 
+    /**
+     * Data provider
+     *
+     * @return array
+     */
     public function provideDates()
     {
         return array(
@@ -93,6 +118,9 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Test getLatestTimestamp()
+     */
     public function testGetLatestTimestamp()
     {
         $fileCache = new FileCacheService($this->cacheDirectory);
@@ -103,6 +131,9 @@ class FileCacheServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1344344353, $fileCache->getLatestTimestamp());
     }
 
+    /**
+     * Test data can be retrieved by another cache instance
+     */
     public function testThatDataCanBeRetrievedByAnotherCacheInstance()
     {
         $fileCache = new FileCacheService($this->cacheDirectory);

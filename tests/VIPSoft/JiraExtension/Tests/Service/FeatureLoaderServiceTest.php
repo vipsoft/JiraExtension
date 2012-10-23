@@ -15,6 +15,7 @@ use VIPSoft\JiraExtension\Service\FeatureLoaderService;
  *
  * @author Jakub Zalas <jakub@zalas.pl>
  * @author Anthon Pang <apang@softwaredevelopment.ca>
+ * @author Pascal Rehfeldt <Pascal@Pascal-Rehfeldt.com>
  */
 class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +27,10 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
 
     private $featureLoader = null;
 
-    public function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
     {
         $this->jiraService = $this->getMockBuilder('VIPSoft\JiraExtension\Service\JiraService')
             ->disableOriginalConstructor()
@@ -41,19 +45,28 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('parse'))
             ->getMock();
 
-        $this->featureLoader = new FeatureLoaderService($this->jiraService, $this->cacheService, $this->gherkinParser);
+        $this->featureLoader = new FeatureLoaderService($this->jiraService, $this->cacheService, $this->gherkinParser, 'description');
     }
 
+    /**
+     * Test supports() doesn't require a resource
+     */
     public function testThatResourceIsOptional()
     {
         $this->assertTrue($this->featureLoader->supports(''));
     }
 
+    /**
+     * Test support for issue key
+     */
     public function testThatIssueKeyIsSupported()
     {
         $this->assertTrue($this->featureLoader->supports('jira:BDD-13'));
     }
 
+    /**
+     * Test support for URL + Issue
+     */
     public function testThatIssueUrlIsSupported()
     {
         $url = 'https://acme.jira.com/browser/BDD-13';
@@ -66,6 +79,9 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->featureLoader->supports($url));
     }
 
+    /**
+     * Test support for JIRA URL
+     */
     public function testThatJiraUrlIsSupported()
     {
         $url = 'https://acme.jira.com';
@@ -78,6 +94,9 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->featureLoader->supports($url));
     }
 
+    /**
+     * Fetch a single issue given an issue key
+     */
     public function testThatLoadFetchesSingleIssueByIssueKey()
     {
         $url = 'https://acme.jira.com/browse/BDD-13';
@@ -108,6 +127,9 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Behat\Gherkin\Node\FeatureNode', $issues[0]);
     }
 
+    /**
+     * Fetch a single issue given a URL
+     */
     public function testThatLoadFetchesSingleIssueByUrl()
     {
         $url = 'https://acme.jira.com/browse/BDD-13';
@@ -143,6 +165,9 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Behat\Gherkin\Node\FeatureNode', $issues[0]);
     }
 
+    /**
+     * Auto-tag with assignee
+     */
     public function testThatFeatureIsTaggedWithAssignee()
     {
         $url = 'https://acme.jira.com/browse/BDD-13';
@@ -180,6 +205,9 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $issues);
     }
 
+    /**
+     * Auto-tag fix versions
+     */
     public function testThatFeatureIsTaggedWithFixVersions()
     {
         $url = 'https://acme.jira.com/browse/BDD-13';
@@ -217,6 +245,9 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $issues);
     }
 
+    /**
+     * Load multiple features
+     */
     public function testLoadingMultipleFeatures()
     {
         $url = 'https://acme.jira.com/browse/';
@@ -252,5 +283,72 @@ class FeatureLoaderServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $issues);
         $this->assertInstanceOf('Behat\Gherkin\Node\FeatureNode', $issues['BDD-13']);
         $this->assertInstanceOf('Behat\Gherkin\Node\FeatureNode', $issues['BDD-14']);
+    }
+
+    /**
+     * Make private and protected function callable
+     *
+     * @param string $function
+     *
+     * @return \ReflectionMethod
+     */
+    public function makeTestable($function)
+    {
+        $method = new \ReflectionMethod($this->featureLoader, $function);
+        $method->setAccessible(true);
+
+        return $method;
+    }
+
+    /**
+     * Sets the given property to given value on Object in Test
+     *
+     * @param string $name  Property name
+     * @param mixed  $value Value
+     */
+    public function setPropertyOnObject($name, $value)
+    {
+        $property = new \ReflectionProperty($this->featureLoader, $name);
+        $property->setAccessible(true);
+        $property->setValue($this->featureLoader, $value);
+    }
+
+    /**
+     * Get feature from default field
+     */
+    public function testGetFeatureWithDefaultField()
+    {
+        $issue = (object) array(
+            'description' => '{code}foobar{code}'
+        );
+
+        $this->setPropertyOnObject('featureField', 'description');
+
+        $method = $this->makeTestable('getFeature');
+        $result = $method->invoke($this->featureLoader, $issue);
+
+        $this->assertEquals('foobar', $result);
+    }
+
+    /**
+     * Get feature from custom field
+     */
+    public function testGetFeatureWithCustomField()
+    {
+        $issue = (object) array(
+            'customFieldValues' => array(
+                (object) array(
+                    'customfieldId' => 'foo',
+                    'values' => array('{code}foobar{code}')
+                )
+            )
+        );
+
+        $this->setPropertyOnObject('featureField', 'foo');
+
+        $method = $this->makeTestable('getFeature');
+        $result = $method->invoke($this->featureLoader, $issue);
+
+        $this->assertEquals('foobar', $result);
     }
 }
