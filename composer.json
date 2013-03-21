@@ -4,7 +4,7 @@
     "description": "Load features for Behat from Jira issues",
     "keywords": ["bdd", "behat", "jira", "feature"],
     "homepage": "http://github.com/vipsoft/",
-    "license": "",
+    "license": "MIT",
     "authors": [
         {
             "name": "Anthon Pang",
