@@ -40,6 +40,9 @@ class Extension implements ExtensionInterface
         if (isset($config['jql'])) {
             $container->setParameter('behat.jira.jql', $config['jql']);
         }
+				if (isset($config['status_on_pass'])) {
+            $container->setParameter('behat.jira.status_on_pass', $config['status_on_pass']);
+        }
         if (isset($config['comment_on_pass'])) {
             $container->setParameter('behat.jira.comment_on_pass', $config['comment_on_pass']);
         }
@@ -76,6 +79,9 @@ class Extension implements ExtensionInterface
                 end()->
                 scalarNode('jql')->
                     defaultNull()->
+                end()->
+								scalarNode('status_on_pass')->
+                    defaultFalse()->
                 end()->
                 scalarNode('comment_on_pass')->
                     defaultFalse()->

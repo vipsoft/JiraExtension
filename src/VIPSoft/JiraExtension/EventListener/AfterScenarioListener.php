@@ -24,6 +24,7 @@ class AfterScenarioListener implements EventSubscriberInterface
     private $commentOnFail;
     private $reopenOnFail;
     private $jiraService;
+		private $statusOnPass;
 
     /**
      * Constructor
@@ -33,8 +34,9 @@ class AfterScenarioListener implements EventSubscriberInterface
      * @param boolean     $reopenOnFail  Reopen issue when scenario fails
      * @param JiraService $jiraService   Jira service
      */
-    public function __construct($commentOnPass, $commentOnFail, $reopenOnFail, $jiraService)
+    public function __construct($statusOnPass, $commentOnPass, $commentOnFail, $reopenOnFail, $jiraService)
     {
+        $this->statusOnPass = $statusOnPass;
         $this->commentOnPass = $commentOnPass;
         $this->commentOnFail = $commentOnFail;
         $this->reopenOnFail = $reopenOnFail;
@@ -93,6 +95,8 @@ class AfterScenarioListener implements EventSubscriberInterface
     {
         if ($result === StepEvent::FAILED && $this->reopenOnFail) {
             $this->jiraService->reopenIssue($issue);
+        } elseif ($result === StepEvent::PASSED && $this->statusOnPass) {
+            $this->jiraService->actionIssue($issue, $this->statusOnPass);
         }
     }
 }

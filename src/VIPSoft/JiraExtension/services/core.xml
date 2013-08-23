@@ -13,6 +13,7 @@
         <parameter key="behat.jira.user"></parameter>
         <parameter key="behat.jira.password"></parameter>
         <parameter key="behat.jira.jql"></parameter>
+				<parameter key="behat.jira.status_on_pass"></parameter>
         <parameter key="behat.jira.comment_on_pass"></parameter>
         <parameter key="behat.jira.comment_on_fail"></parameter>
         <parameter key="behat.jira.reopen_on_fail"></parameter>
@@ -49,6 +50,7 @@
         </service>
 
         <service id="behat.jira.listener.after_scenario" class="%behat.jira.listener.after_scenario.class%">
+						<argument type="string">%behat.jira.status_on_pass%</argument>
             <argument type="string">%behat.jira.comment_on_pass%</argument>
             <argument type="string">%behat.jira.comment_on_fail%</argument>
             <argument type="string">%behat.jira.reopen_on_fail%</argument>
