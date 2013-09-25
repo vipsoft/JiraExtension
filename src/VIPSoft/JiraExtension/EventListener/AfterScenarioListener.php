@@ -20,27 +20,32 @@ use VIPSoft\JiraExtension\Service\JiraService;
  */
 class AfterScenarioListener implements EventSubscriberInterface
 {
-    private $commentOnPass;
-    private $commentOnFail;
-    private $reopenOnFail;
-    private $jiraService;
-		private $statusOnPass;
+  private $actionOnFail;
+  private $actionOnPass;
+  private $commentOnFail;
+  private $commentOnPass;
+  private $screenshotOnFail;
+  private $featureField;
+  private $jiraService;
+
 
     /**
      * Constructor
      *
-     * @param boolean     $commentOnPass Post comment when scenario passes
-     * @param boolean     $commentOnFail Post comment when scenario fails
-     * @param boolean     $reopenOnFail  Reopen issue when scenario fails
-     * @param JiraService $jiraService   Jira service
+     * @param array $serviceParams
+     *   array of configuration parameters for service
+     * @param JiraService $jiraService
+     *   Jira service
      */
-    public function __construct($statusOnPass, $commentOnPass, $commentOnFail, $reopenOnFail, $jiraService)
+    public function __construct($serviceParams, $jiraService)
     {
-        $this->statusOnPass = $statusOnPass;
-        $this->commentOnPass = $commentOnPass;
-        $this->commentOnFail = $commentOnFail;
-        $this->reopenOnFail = $reopenOnFail;
-        $this->jiraService = $jiraService;
+      $this->actionOnFail = $serviceParams['actionOnFail'];
+      $this->actionOnPass = $serviceParams['actionOnPass'];
+      $this->commentOnFail = $serviceParams['commentOnFail'];
+      $this->commentOnPass = $serviceParams['commentOnPass'];
+      $this->screenshotOnFail = $serviceParams['screenshotOnFail'];
+      $this->featureField = $serviceParams['featureField'];
+      $this->jiraService = $jiraService;
     }
 
     /**
@@ -48,7 +53,7 @@ class AfterScenarioListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array('afterScenario' => 'afterScenario');
+      return array('afterScenario' => 'afterScenario');
     }
 
     /**
@@ -69,7 +74,7 @@ class AfterScenarioListener implements EventSubscriberInterface
         }
     }
 
-    /** 
+    /**
      * Post comment in corresponding Jira issue
      *
      * @param string  $issue  Issue key
@@ -85,7 +90,7 @@ class AfterScenarioListener implements EventSubscriberInterface
         }
     }
 
-    /** 
+    /**
      * Update Jira issue status
      *
      * @param string  $issue  Issue key
@@ -95,8 +100,8 @@ class AfterScenarioListener implements EventSubscriberInterface
     {
         if ($result === StepEvent::FAILED && $this->reopenOnFail) {
             $this->jiraService->reopenIssue($issue);
-        } elseif ($result === StepEvent::PASSED && $this->statusOnPass) {
-            $this->jiraService->actionIssue($issue, $this->statusOnPass);
+        } elseif ($result === StepEvent::PASSED && $this->actionOnPass) {
+            $this->jiraService->actionIssue($issue, $this->actionOnPass);
         }
     }
 }

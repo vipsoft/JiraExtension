@@ -40,21 +40,10 @@ class Extension implements ExtensionInterface
         if (isset($config['jql'])) {
             $container->setParameter('behat.jira.jql', $config['jql']);
         }
-				if (isset($config['status_on_pass'])) {
-            $container->setParameter('behat.jira.status_on_pass', $config['status_on_pass']);
+				if (isset($config['service_params'])) {
+            $container->setParameter('behat.jira.service_params', $config['service_params']);
         }
-        if (isset($config['comment_on_pass'])) {
-            $container->setParameter('behat.jira.comment_on_pass', $config['comment_on_pass']);
-        }
-        if (isset($config['comment_on_fail'])) {
-            $container->setParameter('behat.jira.comment_on_fail', $config['comment_on_fail']);
-        }
-        if (isset($config['reopen_on_fail'])) {
-            $container->setParameter('behat.jira.reopen_on_fail', $config['reopen_on_fail']);
-        }
-        if (isset($config['feature_field'])) {
-            $container->setParameter('behat.jira.feature_field', $config['feature_field']);
-        }
+
         if (isset($config['cache_directory'])) {
             $directory = realpath(rtrim($config['cache_directory'], '/'));
             $container->setParameter('behat.jira.cache_directory', $directory);
@@ -80,8 +69,11 @@ class Extension implements ExtensionInterface
                 scalarNode('jql')->
                     defaultNull()->
                 end()->
-								scalarNode('status_on_pass')->
+								scalarNode('action_on_pass')->
                     defaultFalse()->
+                end()->
+                scalarNode('action_on_fail')->
+                  defaultFalse()->
                 end()->
                 scalarNode('comment_on_pass')->
                     defaultFalse()->
@@ -89,11 +81,14 @@ class Extension implements ExtensionInterface
                 scalarNode('comment_on_fail')->
                     defaultFalse()->
                 end()->
-                scalarNode('reopen_on_fail')->
+                scalarNode('screenshot_on_fail')->
                     defaultFalse()->
                 end()->
                 scalarNode('feature_field')->
                     defaultValue('description')->
+                end()->
+                scalarNode('service_params')->
+                  defaultNull()->
                 end()->
                 scalarNode('cache_directory')->
                     defaultNull()->

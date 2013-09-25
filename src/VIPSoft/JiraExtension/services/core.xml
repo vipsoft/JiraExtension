@@ -13,11 +13,14 @@
         <parameter key="behat.jira.user"></parameter>
         <parameter key="behat.jira.password"></parameter>
         <parameter key="behat.jira.jql"></parameter>
-				<parameter key="behat.jira.status_on_pass"></parameter>
-        <parameter key="behat.jira.comment_on_pass"></parameter>
-        <parameter key="behat.jira.comment_on_fail"></parameter>
-        <parameter key="behat.jira.reopen_on_fail"></parameter>
-        <parameter key="behat.jira.feature_field"></parameter>
+        <parameter key="behat.jira.service_params" type="collection">
+		  <parameter key="action_on_pass"></parameter>
+          <parameter key="action_on_fail"></parameter>
+          <parameter key="comment_on_pass"></parameter>
+          <parameter key="comment_on_fail"></parameter>
+          <parameter key="screenshot_on_fail"></parameter>
+          <parameter key="feature_field"></parameter>
+        </parameter>
     </parameters>
 
     <services>
@@ -50,10 +53,7 @@
         </service>
 
         <service id="behat.jira.listener.after_scenario" class="%behat.jira.listener.after_scenario.class%">
-						<argument type="string">%behat.jira.status_on_pass%</argument>
-            <argument type="string">%behat.jira.comment_on_pass%</argument>
-            <argument type="string">%behat.jira.comment_on_fail%</argument>
-            <argument type="string">%behat.jira.reopen_on_fail%</argument>
+			<argument type="collection">%behat.jira.service_params%</argument>
             <argument type="service" id="behat.jira.service.jira" />
             <tag name="behat.event_subscriber" priority="0" />
         </service>
