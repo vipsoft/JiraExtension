@@ -69,26 +69,27 @@ class Extension implements ExtensionInterface
                 scalarNode('jql')->
                     defaultNull()->
                 end()->
-								scalarNode('action_on_pass')->
-                    defaultFalse()->
-                end()->
-                scalarNode('action_on_fail')->
-                  defaultFalse()->
-                end()->
-                scalarNode('comment_on_pass')->
-                    defaultFalse()->
-                end()->
-                scalarNode('comment_on_fail')->
-                    defaultFalse()->
-                end()->
-                scalarNode('screenshot_on_fail')->
-                    defaultFalse()->
-                end()->
-                scalarNode('feature_field')->
-                    defaultValue('description')->
-                end()->
                 arrayNode('service_params')->
-                  defaultNull()->
+                  children()->
+                    scalarNode('action_on_pass')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('action_on_fail')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('comment_on_pass')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('comment_on_fail')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('screenshot_on_fail')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('feature_field')->
+                      defaultValue('description')->
+                    end()->
+                  end()->
                 end()->
                 scalarNode('cache_directory')->
                     defaultNull()->
