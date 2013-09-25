@@ -98,8 +98,8 @@ class AfterScenarioListener implements EventSubscriberInterface
      */
     private function updateIssue($issue, $result)
     {
-        if ($result === StepEvent::FAILED && $this->reopenOnFail) {
-            $this->jiraService->reopenIssue($issue);
+        if ($result === StepEvent::FAILED && $this->actionOnFail) {
+            $this->jiraService->actionIssue($issue, $this->actionOnFail);
         } elseif ($result === StepEvent::PASSED && $this->actionOnPass) {
             $this->jiraService->actionIssue($issue, $this->actionOnPass);
         }
