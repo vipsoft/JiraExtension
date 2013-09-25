@@ -28,24 +28,24 @@ class Extension implements ExtensionInterface
       $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/services'));
       $loader->load('core.xml');
 
-      if (isset($config['host'])) {
-          $container->setParameter('behat.jira.host', rtrim($config['host'], '/'));
-      }
-      if (isset($config['user'])) {
-          $container->setParameter('behat.jira.user', $config['user']);
-      }
-      if (isset($config['password'])) {
-          $container->setParameter('behat.jira.password', $config['password']);
-      }
-      if (isset($config['jql'])) {
-          $container->setParameter('behat.jira.jql', $config['jql']);
-      }
-      if (isset($config['service_params'])) {
-          $container->setParameter('behat.jira.service_params', $config['service_params']);
-      }
-      if (isset($config['cache_directory'])) {
-          $directory = realpath(rtrim($config['cache_directory'], '/'));
-          $container->setParameter('behat.jira.cache_directory', $directory);
+      if (!empty($config)) {
+        foreach ($config as $key => $value) {
+          if ($key == 'host') {
+            $value = rtrim($value, '/');
+          }
+          elseif ($key == 'cache_directory') {
+            $value = realpath(rtrim($config['cache_directory'], '/'));
+          }
+          elseif ($key == 'service_params') {
+            if (!empty($value)) {
+              foreach ($value as $param_key=>$param_value) {
+                $container->setParameter('behat.jira.' . $param_key, $param_value);
+              }
+            }
+          }
+
+          $container->setParameter('behat.jira.' . $key, $value);
+        }
       }
     }
 
