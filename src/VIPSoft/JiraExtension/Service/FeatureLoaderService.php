@@ -36,7 +36,7 @@ class FeatureLoaderService
         $this->jiraService = $jiraService;
         $this->cacheService = $cacheService;
         $this->gherkinParser = $gherkinParser;
-        $this->featureField = $serviceParams['featureField'];
+        $this->featureField = $serviceParams['feature_field'];
     }
 
     /**

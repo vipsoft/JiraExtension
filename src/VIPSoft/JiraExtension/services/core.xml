@@ -59,6 +59,7 @@
         </service>
 
         <service id="behat.jira.listener.after_scenario" class="%behat.jira.listener.after_scenario.class%">
+            <argument type="service" id="behat.jira.service.jira" />
             <argument type="collection">
                 <argument key="action_on_pass">%behat.jira.action_on_pass%</argument>
                 <argument key="action_on_fail">%behat.jira.action_on_fail%</argument>
@@ -67,7 +68,6 @@
                 <argument key="screenshot_on_fail">%behat.jira.screenshot_on_fail%</argument>
                 <argument key="feature_field">%behat.jira.feature_field%</argument>
             </argument>
-            <argument type="service" id="behat.jira.service.jira" />
             <tag name="behat.event_subscriber" priority="0" />
         </service>
     </services>
