@@ -39,6 +39,7 @@ class AfterScenarioListener implements EventSubscriberInterface
      */
     public function __construct($serviceParams, $jiraService)
     {
+      print_r($serviceParams);
       $this->actionOnFail = $serviceParams['actionOnFail'];
       $this->actionOnPass = $serviceParams['actionOnPass'];
       $this->commentOnFail = $serviceParams['commentOnFail'];
