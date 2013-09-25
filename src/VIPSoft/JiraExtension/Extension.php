@@ -87,7 +87,7 @@ class Extension implements ExtensionInterface
                 scalarNode('feature_field')->
                     defaultValue('description')->
                 end()->
-                scalarNode('service_params')->
+                arrayNode('service_params')->
                   defaultNull()->
                 end()->
                 scalarNode('cache_directory')->
