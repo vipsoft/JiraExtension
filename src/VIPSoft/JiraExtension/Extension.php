@@ -25,29 +25,28 @@ class Extension implements ExtensionInterface
      */
     public function load(array $config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/services'));
-        $loader->load('core.xml');
+      $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/services'));
+      $loader->load('core.xml');
 
-        if (isset($config['host'])) {
-            $container->setParameter('behat.jira.host', rtrim($config['host'], '/'));
-        }
-        if (isset($config['user'])) {
-            $container->setParameter('behat.jira.user', $config['user']);
-        }
-        if (isset($config['password'])) {
-            $container->setParameter('behat.jira.password', $config['password']);
-        }
-        if (isset($config['jql'])) {
-            $container->setParameter('behat.jira.jql', $config['jql']);
-        }
-				if (isset($config['service_params'])) {
-            $container->setParameter('behat.jira.service_params', $config['service_params']);
-        }
-
-        if (isset($config['cache_directory'])) {
-            $directory = realpath(rtrim($config['cache_directory'], '/'));
-            $container->setParameter('behat.jira.cache_directory', $directory);
-        }
+      if (isset($config['host'])) {
+          $container->setParameter('behat.jira.host', rtrim($config['host'], '/'));
+      }
+      if (isset($config['user'])) {
+          $container->setParameter('behat.jira.user', $config['user']);
+      }
+      if (isset($config['password'])) {
+          $container->setParameter('behat.jira.password', $config['password']);
+      }
+      if (isset($config['jql'])) {
+          $container->setParameter('behat.jira.jql', $config['jql']);
+      }
+      if (isset($config['service_params'])) {
+          $container->setParameter('behat.jira.service_params', $config['service_params']);
+      }
+      if (isset($config['cache_directory'])) {
+          $directory = realpath(rtrim($config['cache_directory'], '/'));
+          $container->setParameter('behat.jira.cache_directory', $directory);
+      }
     }
 
     /**
