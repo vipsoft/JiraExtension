@@ -28,14 +28,15 @@ class FeatureLoaderService
      * @param JiraService  $jiraService   Jira service
      * @param CacheService $cacheService  Cache service
      * @param Parser       $gherkinParser Gherkin parser
-     * @param string       $featureField  Field in Jira
+     * @param array       $serviceParams
+     *   array of configuration parameters
      */
-    public function __construct($jiraService, $cacheService, $gherkinParser, $featureField)
+    public function __construct($jiraService, $cacheService, $gherkinParser, $serviceParams)
     {
         $this->jiraService = $jiraService;
         $this->cacheService = $cacheService;
         $this->gherkinParser = $gherkinParser;
-        $this->featureField = $featureField;
+        $this->featureField = $serviceParams['feature_field'];
     }
 
     /**

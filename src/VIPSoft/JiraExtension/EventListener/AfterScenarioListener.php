@@ -20,25 +20,32 @@ use VIPSoft\JiraExtension\Service\JiraService;
  */
 class AfterScenarioListener implements EventSubscriberInterface
 {
-    private $commentOnPass;
-    private $commentOnFail;
-    private $reopenOnFail;
-    private $jiraService;
+  private $actionOnFail;
+  private $actionOnPass;
+  private $commentOnFail;
+  private $commentOnPass;
+  private $screenshotOnFail;
+  private $featureField;
+  private $jiraService;
+
 
     /**
      * Constructor
      *
-     * @param boolean     $commentOnPass Post comment when scenario passes
-     * @param boolean     $commentOnFail Post comment when scenario fails
-     * @param boolean     $reopenOnFail  Reopen issue when scenario fails
-     * @param JiraService $jiraService   Jira service
+     * @param array $serviceParams
+     *   array of configuration parameters for service
+     * @param JiraService $jiraService
+     *   Jira service
      */
-    public function __construct($commentOnPass, $commentOnFail, $reopenOnFail, $jiraService)
+    public function __construct($jiraService, $serviceParams)
     {
-        $this->commentOnPass = $commentOnPass;
-        $this->commentOnFail = $commentOnFail;
-        $this->reopenOnFail = $reopenOnFail;
-        $this->jiraService = $jiraService;
+      $this->actionOnFail = $serviceParams['action_on_fail'];
+      $this->actionOnPass = $serviceParams['action_on_pass'];
+      $this->commentOnFail = $serviceParams['comment_on_fail'];
+      $this->commentOnPass = $serviceParams['comment_on_pass'];
+      $this->screenshotOnFail = $serviceParams['screenshot_on_fail'];
+      $this->featureField = $serviceParams['feature_field'];
+      $this->jiraService = $jiraService;
     }
 
     /**
@@ -46,7 +53,7 @@ class AfterScenarioListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array('afterScenario' => 'afterScenario');
+      return array('afterScenario' => 'afterScenario');
     }
 
     /**
@@ -67,7 +74,7 @@ class AfterScenarioListener implements EventSubscriberInterface
         }
     }
 
-    /** 
+    /**
      * Post comment in corresponding Jira issue
      *
      * @param string  $issue  Issue key
@@ -83,7 +90,7 @@ class AfterScenarioListener implements EventSubscriberInterface
         }
     }
 
-    /** 
+    /**
      * Update Jira issue status
      *
      * @param string  $issue  Issue key
@@ -91,8 +98,10 @@ class AfterScenarioListener implements EventSubscriberInterface
      */
     private function updateIssue($issue, $result)
     {
-        if ($result === StepEvent::FAILED && $this->reopenOnFail) {
-            $this->jiraService->reopenIssue($issue);
+        if ($result === StepEvent::FAILED && $this->actionOnFail) {
+            $this->jiraService->actionIssue($issue, $this->actionOnFail);
+        } elseif ($result === StepEvent::PASSED && $this->actionOnPass) {
+            $this->jiraService->actionIssue($issue, $this->actionOnPass);
         }
     }
 }

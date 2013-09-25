@@ -176,6 +176,46 @@ class JiraService
             $this->soapClient->progressWorkflowAction($this->token, $id, $action, array());
         }
     }
+		
+		/**
+     * Get action ID
+     *
+     * @param string $id Issue key
+		 * @param string $action_string 
+     *
+     * @return string
+     */
+    private function getActionId($id, $action_string)
+    {
+			$string = strtolower($action_string);
+			$actions = $this->soapClient->getAvailableActions($this->token, $id);
+
+			foreach ($actions as $action) {
+				if (strpos(strtolower($action->name), $string) !== false) {
+					return $action->id;
+				}
+			}
+    }
+		
+		/**
+     * Change issue status using a custom action
+     *
+     * @param string $id Issue key
+		 * @param string $custom_action 
+     *
+     * {@internal subject to workflow progression rules }}}
+     */
+    public function actionIssue($id, $action_string)
+    {
+        $this->connect();
+
+        $action = $this->getActionId($id, $action_string);
+
+        if (isset($action)) {
+            $this->soapClient->progressWorkflowAction($this->token, $id, $action, array());
+        }
+    }
+		
 
     /**
      * Get Jira issue from URL
