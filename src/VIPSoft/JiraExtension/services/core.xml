@@ -33,7 +33,7 @@
             <argument type="service" id="behat.jira.service.jira" />
             <argument type="service" id="behat.jira.service.file_cache" />
             <argument type="service" id="gherkin.parser" />
-            <argument type="string">%behat.jira.feature_field%</argument>
+            <argument type="string">%behat.jira.service_params.feature_field%</argument>
         </service>
 
         <service id="behat.jira.service.file_cache" class="%behat.jira.service.file_cache.class%">
