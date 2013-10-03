@@ -67,7 +67,7 @@ class AfterScenarioListener implements EventSubscriberInterface
         }
     }
 
-    /** 
+    /**
      * Post comment in corresponding Jira issue
      *
      * @param string  $issue  Issue key
@@ -83,7 +83,7 @@ class AfterScenarioListener implements EventSubscriberInterface
         }
     }
 
-    /** 
+    /**
      * Update Jira issue status
      *
      * @param string  $issue  Issue key
