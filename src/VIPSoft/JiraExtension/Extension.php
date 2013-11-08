@@ -25,37 +25,28 @@ class Extension implements ExtensionInterface
      */
     public function load(array $config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/services'));
-        $loader->load('core.xml');
+      $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/services'));
+      $loader->load('core.xml');
 
-        if (isset($config['host'])) {
-            $container->setParameter('behat.jira.host', rtrim($config['host'], '/'));
+      if (!empty($config)) {
+        foreach ($config as $key => $value) {
+          if ($key == 'host') {
+            $value = rtrim($value, '/');
+          }
+          elseif ($key == 'cache_directory') {
+            $value = realpath(rtrim($config['cache_directory'], '/'));
+          }
+          elseif ($key == 'service_params') {
+            if (!empty($value)) {
+              foreach ($value as $param_key=>$param_value) {
+                $container->setParameter('behat.jira.' . $param_key, $param_value);
+              }
+            }
+          }
+
+          $container->setParameter('behat.jira.' . $key, $value);
         }
-        if (isset($config['user'])) {
-            $container->setParameter('behat.jira.user', $config['user']);
-        }
-        if (isset($config['password'])) {
-            $container->setParameter('behat.jira.password', $config['password']);
-        }
-        if (isset($config['jql'])) {
-            $container->setParameter('behat.jira.jql', $config['jql']);
-        }
-        if (isset($config['comment_on_pass'])) {
-            $container->setParameter('behat.jira.comment_on_pass', $config['comment_on_pass']);
-        }
-        if (isset($config['comment_on_fail'])) {
-            $container->setParameter('behat.jira.comment_on_fail', $config['comment_on_fail']);
-        }
-        if (isset($config['reopen_on_fail'])) {
-            $container->setParameter('behat.jira.reopen_on_fail', $config['reopen_on_fail']);
-        }
-        if (isset($config['feature_field'])) {
-            $container->setParameter('behat.jira.feature_field', $config['feature_field']);
-        }
-        if (isset($config['cache_directory'])) {
-            $directory = realpath(rtrim($config['cache_directory'], '/'));
-            $container->setParameter('behat.jira.cache_directory', $directory);
-        }
+      }
     }
 
     /**
@@ -77,17 +68,27 @@ class Extension implements ExtensionInterface
                 scalarNode('jql')->
                     defaultNull()->
                 end()->
-                scalarNode('comment_on_pass')->
-                    defaultFalse()->
-                end()->
-                scalarNode('comment_on_fail')->
-                    defaultFalse()->
-                end()->
-                scalarNode('reopen_on_fail')->
-                    defaultFalse()->
-                end()->
-                scalarNode('feature_field')->
-                    defaultValue('description')->
+                arrayNode('service_params')->
+                  children()->
+                    scalarNode('action_on_pass')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('action_on_fail')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('comment_on_pass')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('comment_on_fail')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('screenshot_on_fail')->
+                      defaultFalse()->
+                    end()->
+                    scalarNode('feature_field')->
+                      defaultValue('description')->
+                    end()->
+                  end()->
                 end()->
                 scalarNode('cache_directory')->
                     defaultNull()->
