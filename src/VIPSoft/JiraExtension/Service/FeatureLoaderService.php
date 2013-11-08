@@ -67,17 +67,17 @@ class FeatureLoaderService
         $body = $this->getFeature($issue);
         $url = $this->jiraService->getUrl($issue->key) . '#';
         $feature = $this->gherkinParser->parse($body, $url);
-
-        if (isset($issue->assignee)) {
+        if (!empty($feature)) {
+          if (isset($issue->assignee)) {
             $feature->addTag('assignee:' . str_replace(array(' ', '@'), '_', $issue->assignee));
-        }
+          }
 
-        if (isset($issue->fixVersions)) {
+          if (isset($issue->fixVersions)) {
             foreach ($issue->fixVersions as $fixVersion) {
-               $feature->addTag('fixVersion:' . str_replace(array(' ', '@'), '_', $fixVersion->name));
+              $feature->addTag('fixVersion:' . str_replace(array(' ', '@'), '_', $fixVersion->name));
             }
+          }
         }
-
         return $feature;
     }
 
