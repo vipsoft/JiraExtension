@@ -46,21 +46,34 @@ class JiraService
     private $token;
 
     /**
+     * @var string $featureField
+     */
+    private $featureField;
+
+    /**
+     * @var array $store
+     */
+    private $store;
+
+    /**
      * Constructor
      *
-     * @param \SoapClient $soapClient SOAP client class name
-     * @param string      $host       Jira server base URL
-     * @param string      $user       Jira user ID
-     * @param string      $password   Jira user password
-     * @param string      $jql        JQL query
+     * @param \SoapClient $soapClient   SOAP client class name
+     * @param string      $host         Jira server base URL
+     * @param string      $user         Jira user ID
+     * @param string      $password     Jira user password
+     * @param string      $jql          JQL query
+     * @param string      $featureField Jira field to upload feature file
      */
-    public function __construct(\SoapClient $soapClient, $host, $user, $password, $jql)
+    public function __construct(\SoapClient $soapClient, $host, $user, $password, $jql, $featureField)
     {
         $this->soapClient = $soapClient;
         $this->host = $host;
         $this->user = $user;
         $this->password = $password;
         $this->jql = $jql;
+        $this->featureField = $featureField;
+        $this->store = array();
     }
 
     /**
@@ -199,6 +212,71 @@ class JiraService
     }
 
     /**
+     * Add Scenario to internal store
+     * 
+     * @param array  $jiraTags
+     * @param string $scenarioText
+     */
+    public function pushScenario($jiraTags, $scenarioText)
+    {   
+        foreach ($jiraTags as $value) {
+            $this->store[$value][] = $scenarioText;
+        }
+    }
+
+    /**
+     * Sync Scenario to Jira
+     */
+    public function postIssue()
+    {
+        $this->connect();
+
+        foreach ($this->getStore() as $jiraTicket => $value) {
+            if ($this->compareIssueField($jiraTicket, $value)) {
+                $data = array(
+                    'fields'=>array(
+                    'id'=>$this->featureField,
+                    'values'=>array(implode($value) . "\n\n")
+                ));
+                $this->soapClient->updateIssue($this->token, $jiraTicket, $data);
+            }
+        }
+    }
+
+    /**
+     * Compare the issue fields if they are the same or not 
+     * 
+     * @param string $jiraTicket
+     * @param string $value
+     * 
+     * @return boolean
+     */
+    public function compareIssueField($jiraTicket, $value){
+        $issue = $this->fetchIssue($jiraTicket);
+
+        $arrayIssue = (array) $issue;
+        $fieldValue = null;
+
+        if (array_key_exists($this->featureField, $arrayIssue)) {
+            $fieldValue = $arrayIssue[$this->featureField];
+        } else {
+            $customFields = $arrayIssue['customFieldValues'];
+            foreach ($customFields as $customField) {
+                if ($this->featureField == $customField->customfieldId) {
+                    $fieldValue = current($customField->values);
+                }
+            }
+        }
+
+        $strip = preg_replace("/[\n\r]/","",$fieldValue);  
+        if ($strip===implode($value)) {
+           return false; //Issues are the same
+        }
+
+        return true; //Issues are not the same
+    }
+
+    /**
      * Get Jira URL for issue
      *
      * @param string $id Issue key
@@ -220,5 +298,15 @@ class JiraService
     public function urlMatches($url)
     {
         return strncmp($url, $this->host, strlen($this->host)) === 0;
+    }
+
+    /**
+     * Return the internal store of JiraTickets and Features
+     * 
+     * @return array $store
+     */
+    public function getStore()
+    {
+        return $this->store;
     }
 }

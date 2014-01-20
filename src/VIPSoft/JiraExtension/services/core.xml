@@ -46,12 +46,15 @@
             <argument type="string">%behat.jira.user%</argument>
             <argument type="string">%behat.jira.password%</argument>
             <argument type="string">%behat.jira.jql%</argument>
+            <argument type="string">%behat.jira.feature_field%</argument>
         </service>
 
         <service id="behat.jira.listener.hook" class="%behat.jira.listener.hook.class%">
             <argument type="string">%behat.jira.comment_on_pass%</argument>
             <argument type="string">%behat.jira.comment_on_fail%</argument>
             <argument type="string">%behat.jira.reopen_on_fail%</argument>
+            <argument type="string">%behat.jira.push_issue%</argument>
+            <argument type="string">%behat.jira.tag_pattern%</argument>
             <argument type="service" id="behat.jira.service.jira" />
             <tag name="behat.event_subscriber" priority="0" />
         </service>

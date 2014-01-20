@@ -52,6 +52,12 @@ class Extension implements ExtensionInterface
         if (isset($config['feature_field'])) {
             $container->setParameter('behat.jira.feature_field', $config['feature_field']);
         }
+        if (isset($config['push_issue'])) {
+            $container->setParameter('behat.jira.push_issue', $config['push_issue']);
+        }
+        if (isset($config['tag_pattern'])){
+            $container->setParameter('behat.jira.tag_pattern', $config['tag_pattern']);
+        }
         if (isset($config['cache_directory'])) {
             $directory = realpath(rtrim($config['cache_directory'], '/'));
             $container->setParameter('behat.jira.cache_directory', $directory);
@@ -77,6 +83,9 @@ class Extension implements ExtensionInterface
                 scalarNode('jql')->
                     defaultNull()->
                 end()->
+                scalarNode('push_issue')->
+                    defaultFalse()->
+                end()->
                 scalarNode('comment_on_pass')->
                     defaultFalse()->
                 end()->
@@ -91,6 +100,9 @@ class Extension implements ExtensionInterface
                 end()->
                 scalarNode('cache_directory')->
                     defaultNull()->
+                end()->
+                scalarNode('tag_pattern')->
+                    defaultValue('/jira:(.*)/')->
                 end()->
             end()->
         end();
