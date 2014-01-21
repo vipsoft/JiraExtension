@@ -18,7 +18,7 @@ use VIPSoft\JiraExtension\Service\JiraService;
  *
  * @author Anthon Pang <apang@softwaredevelopment.ca>
  */
-class AfterScenarioListener implements EventSubscriberInterface
+class HookListener implements EventSubscriberInterface
 {
     private $commentOnPass;
     private $commentOnFail;

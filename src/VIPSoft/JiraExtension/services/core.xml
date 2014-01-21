@@ -8,7 +8,7 @@
         <parameter key="behat.jira.service.jira.class">VIPSoft\JiraExtension\Service\JiraService</parameter>
         <parameter key="behat.jira.service.feature_loader.class">VIPSoft\JiraExtension\Service\FeatureLoaderService</parameter>
         <parameter key="behat.jira.service.file_cache.class">VIPSoft\JiraExtension\Service\FileCacheService</parameter>
-        <parameter key="behat.jira.listener.after_scenario.class">VIPSoft\JiraExtension\EventListener\AfterScenarioListener</parameter>
+        <parameter key="behat.jira.listener.hook.class">VIPSoft\JiraExtension\EventListener\HookListener</parameter>
         <parameter key="behat.jira.host"></parameter>
         <parameter key="behat.jira.user"></parameter>
         <parameter key="behat.jira.password"></parameter>
@@ -48,7 +48,7 @@
             <argument type="string">%behat.jira.jql%</argument>
         </service>
 
-        <service id="behat.jira.listener.after_scenario" class="%behat.jira.listener.after_scenario.class%">
+        <service id="behat.jira.listener.hook" class="%behat.jira.listener.hook.class%">
             <argument type="string">%behat.jira.comment_on_pass%</argument>
             <argument type="string">%behat.jira.comment_on_fail%</argument>
             <argument type="string">%behat.jira.reopen_on_fail%</argument>
