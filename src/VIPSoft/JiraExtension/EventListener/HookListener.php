@@ -14,7 +14,7 @@ use Behat\Behat\Event\ScenarioEvent,
 use VIPSoft\JiraExtension\Service\JiraService;
 
 /**
- * After Scenario event listener
+ * Hook event listener
  *
  * @author Anthon Pang <apang@softwaredevelopment.ca>
  */
