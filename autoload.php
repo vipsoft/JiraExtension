@@ -30,3 +30,7 @@ class Bootstrap
 }
 
 spl_autoload_register('VIPSoft\Bootstrap::autoload');
+
+if (! ini_get('date.timezone')) {
+    date_default_timezone_set('America/Toronto');
+}
