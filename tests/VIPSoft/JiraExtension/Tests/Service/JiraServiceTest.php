@@ -34,7 +34,8 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
             'https://acme.jira.com',
             'ted',
             '$ecret',
-            'summary ~ \'Feature\''
+            'summary ~ \'Feature\'',
+            'description'
         );
     }
 
@@ -244,5 +245,87 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->jiraService->urlMatches('https://acme.jira.com/browser/JIRA-12'));
         $this->assertFalse($this->jiraService->urlMatches('https://badger.jira.com/browser/JIRA-12'));
+    }
+
+    /**
+     * Test a specfic Jira Tag gets put into Array
+     */
+    public function testPushScenarios()
+    {
+        $jiraTags = array("BDD-13", "BDD-12");
+        $text = "foo";
+        $this->jiraService->pushScenario($jiraTags, $text);
+
+        $expectedStore = array("BDD-13" => array("foo"), "BDD-12" => array("foo"));
+
+        $store = $this->jiraService->getStore();
+        $this->assertEquals($expectedStore, $store);
+    }
+
+    /**
+     * Sets the given property to given value on Object in Test
+     *
+     * @param string $name  Property name
+     * @param mixed  $value Value
+     */
+    public function setPropertyOnObject($name, $value)
+    {
+        $property = new \ReflectionProperty($this->jiraService, $name);
+        $property->setAccessible(true);
+        $property->setValue($this->jiraService, $value);
+    }
+
+    /**
+     * Test if sync issue works if the issues have different values for fields
+     */
+    public function testSyncIssueIfDifferent()
+    {
+        $exampleStore = array(
+            "BDD-13" => array("foo")
+            );
+
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->once())
+            ->method('getIssue')
+            ->with('AUTH_TOKEN', 'BDD-13')
+            ->will($this->returnValue(array("description" => "bar")));
+
+        $this->soapClient->expects($this->once())
+            ->method('updateIssue');
+
+        $this->setPropertyOnObject("store", $exampleStore);
+
+        $this->jiraService->syncIssue();
+    }
+
+    /**
+     * Test if sync issues don't work if the issues have same field value
+     */
+    public function testSyncIssueIfSame()
+    {
+        $exampleStore = array(
+            "BDD-13" => array("Same Content")
+            );
+
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $this->soapClient->expects($this->once())
+            ->method('getIssue')
+            ->with('AUTH_TOKEN', 'BDD-13')
+            ->will($this->returnValue(array("description" => "Same Content")));
+
+        $this->soapClient->expects($this->never())
+            ->method('updateIssue');
+
+        $this->setPropertyOnObject("store", $exampleStore);
+
+        $this->jiraService->syncIssue();
     }
 }
