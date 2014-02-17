@@ -35,7 +35,8 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
             'ted',
             '$ecret',
             'summary ~ \'Feature\'',
-            'description'
+            'description',
+            'Closed, Resolved'
         );
     }
 
@@ -281,25 +282,33 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
     public function testSyncIssueIfDifferent()
     {
         $exampleStore = array(
-            "BDD-13" => array("foo")
-            );
+            "BDD-13" => array("Different Content")
+        );
 
         $this->soapClient->expects($this->once())
             ->method('login')
             ->with('ted', '$ecret')
             ->will($this->returnValue('AUTH_TOKEN'));
 
+        $closedStatus = (object) array("name" => "Closed", "id" => 1);
+        $openStatus = (object) array("name" => "Open", "id" => 2);
+
         $this->soapClient->expects($this->once())
+            ->method('getStatuses')
+            ->with('AUTH_TOKEN')
+            ->will($this->returnValue(array($closedStatus, $openStatus)));
+
+        $this->soapClient->expects($this->any())
             ->method('getIssue')
             ->with('AUTH_TOKEN', 'BDD-13')
-            ->will($this->returnValue(array("description" => "bar")));
+            ->will($this->returnValue(array("description" => "More Different Content", "status"=>2)));
 
         $this->soapClient->expects($this->once())
             ->method('updateIssue');
 
         $this->setPropertyOnObject("store", $exampleStore);
 
-        $this->jiraService->syncIssue();
+        $this->jiraService->postIssue();
     }
 
     /**
@@ -316,16 +325,64 @@ class JiraServiceTest extends \PHPUnit_Framework_TestCase
             ->with('ted', '$ecret')
             ->will($this->returnValue('AUTH_TOKEN'));
 
+        $closedStatus = (object) array("name" => "Closed", "id" => 1);
+        $openStatus = (object) array("name" => "Open", "id" => 2);
+
         $this->soapClient->expects($this->once())
+            ->method('getStatuses')
+            ->with('AUTH_TOKEN')
+            ->will($this->returnValue(array($closedStatus, $openStatus)));
+
+   
+
+        $this->soapClient->expects($this->any())
             ->method('getIssue')
             ->with('AUTH_TOKEN', 'BDD-13')
-            ->will($this->returnValue(array("description" => "Same Content")));
+            ->will($this->returnValue(array("description" => "Same Content", "status"=>2)));
 
         $this->soapClient->expects($this->never())
             ->method('updateIssue');
 
         $this->setPropertyOnObject("store", $exampleStore);
 
-        $this->jiraService->syncIssue();
+        $this->jiraService->postIssue();
     }
+
+    /**
+     * Test if sync issues don't work if the issues have same field value
+     */
+    public function testIgnoreIssueWorks()
+    {
+        $exampleStore = array(
+            "BDD-13" => array("Closed")
+        );
+
+        $this->soapClient->expects($this->once())
+            ->method('login')
+            ->with('ted', '$ecret')
+            ->will($this->returnValue('AUTH_TOKEN'));
+
+        $closedStatus = (object) array("name" => "Closed", "id" => 1);
+        $openStatus = (object) array("name" => "Open", "id" => 2);
+
+        $this->soapClient->expects($this->once())
+            ->method('getStatuses')
+            ->with('AUTH_TOKEN')
+            ->will($this->returnValue(array($closedStatus, $openStatus)));   
+
+        $this->soapClient->expects($this->any())
+            ->method('getIssue')
+            ->with('AUTH_TOKEN', 'BDD-13')
+            ->will($this->returnValue(array("description" => "Closed", "status"=>1)));
+
+        $this->soapClient->expects($this->never())
+            ->method('updateIssue');
+
+        $this->setPropertyOnObject("store", $exampleStore);
+
+        $this->jiraService->postIssue();
+    }
+
+
+  
 }
