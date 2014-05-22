@@ -31,6 +31,18 @@ class Extension implements ExtensionInterface
         if (isset($config['host'])) {
             $container->setParameter('behat.jira.host', rtrim($config['host'], '/'));
         }
+        if (isset($config['proxy_host'])) {
+            $container->setParameter('behat.jira.proxy_host', $config['proxy_host']);
+        }
+        if (isset($config['proxy_port'])) {
+            $container->setParameter('behat.jira.proxy_port', $config['proxy_port']);
+        }
+        if (isset($config['proxy_login'])) {
+            $container->setParameter('behat.jira.proxy_login', $config['proxy_login']);
+        }
+        if (isset($config['proxy_password'])) {
+            $container->setParameter('behat.jira.proxy_password', $config['proxy_password']);
+        }
         if (isset($config['user'])) {
             $container->setParameter('behat.jira.user', $config['user']);
         }
@@ -66,6 +78,18 @@ class Extension implements ExtensionInterface
         $builder->
             children()->
                 scalarNode('host')->
+                    defaultNull()->
+                end()->
+                scalarNode('proxy_host')->
+                    defaultNull()->
+                end()->
+                scalarNode('proxy_port')->
+                    defaultValue('')->
+                end()->
+                scalarNode('proxy_user')->
+                    defaultValue('')->
+                end()->
+                scalarNode('proxy_password')->
                     defaultNull()->
                 end()->
                 scalarNode('user')->
