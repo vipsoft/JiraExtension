@@ -60,6 +60,7 @@ It is important for the :code:`user` parameter that you use the username not the
           comment_on_fail: true
           reopen_on_fail: false
           cache_directory: /tmp/behat-jira
+          # ...
 
 Settings
 --------
@@ -99,9 +100,10 @@ Description of the Configuration Parameters:
           push_issue: false # Run behat tests and "push" to the associated Jira Ticket
           ignored_statuses: "Closed,Resolved" # Comma separated list of ignored Jira updates. Issues with these statuses will not be pushed to Jira.
           tag_pattern: /jira:(.*)/ # A regex pattern to match the relevant tags to push to Jira
-
-
-
+          proxy_host: iproxy.ca # Optional configuration for making an HTTP connection through a proxy server
+          proxy_port: 8080
+          proxy_login: guest
+          proxy_password: guest
 
 Limitations
 -----------
