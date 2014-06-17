@@ -72,7 +72,7 @@ class HookListener implements EventSubscriberInterface
 
         if ($this->pushIssue) {
             $jiraTags = $this->parseJiraTags($scenario->getTags());
-            $text = implode("\n\t\t", $this->getStepText($scenario));
+            $text = implode("\n", $this->getStepText($scenario));
             $issue = $this->jiraService->pushScenario($jiraTags, $text);
         } else {
             $url = $feature->getFile();
@@ -91,7 +91,11 @@ class HookListener implements EventSubscriberInterface
      */
     public function afterSuite(SuiteEvent $event)
     {
-        if ($this->pushIssue) $this->jiraService->postIssue();
+        if ($this->pushIssue) {
+            file_put_contents('php://stdout', "Pushing issues to Jira...");
+            $this->jiraService->postIssue();
+            file_put_contents('php://stdout', " done!" . PHP_EOL);
+        }
     }
 
     /**
@@ -135,9 +139,8 @@ class HookListener implements EventSubscriberInterface
     public function parseJiraTags($tags)
     {
         $jiraTags = array();
-        
         foreach ($tags as $value) {
-            if (preg_match($this->tagPattern, $value, $results)) {               
+            if (preg_match($this->tagPattern, $value, $results)) {
                 array_push($jiraTags, $results[1]);
             }
         }
@@ -154,26 +157,23 @@ class HookListener implements EventSubscriberInterface
      * @return Array $jiraTags
      */
     public function getStepText($scenario)
-    { 
-        $stepArray = array();
+    {
+
+        $stepArray = array("{code}");
         $feature = $scenario -> getFeature();
 
         //Parse Title
         $title = basename($feature -> getFile());
-        $stepArray[] = "#Title: " . $title;  
+        $stepArray[] = "#Title: " . $title;
 
         //Parse Background
-        if($feature -> hasBackground()){
+        if ($feature -> hasBackground()) {
             $background = $feature -> getBackground();
 
             $backgroundSteps = $background -> getSteps();
-
-            if ($backgroundSteps -> hasSteps()){
-                $stepArray[] = "Background: " . $background -> getTitle();
-            }
-
-            foreach ($scenarioSteps as $step) {
-                $stepArray[] = $step->getType()." ".$step->getText();
+            $stepArray[] = "Background: " . $background -> getTitle();
+            foreach ($backgroundSteps as $step) {
+                $stepArray[] = "  " . $step->getType()." ".$step->getText();
             }
         }
 
@@ -181,8 +181,9 @@ class HookListener implements EventSubscriberInterface
         $stepArray[] = "Scenario: " . $scenario->getTitle();
 
         foreach ($scenarioSteps as $step) {
-            $stepArray[] = $step->getType()." ".$step->getText();
+            $stepArray[] = "  " . $step->getType()." ".$step->getText();
         }
+        $stepArray[] = "{code}";
 
         return $stepArray;
     }

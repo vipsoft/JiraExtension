@@ -55,7 +55,10 @@ class Extension implements ExtensionInterface
         if (isset($config['push_issue'])) {
             $container->setParameter('behat.jira.push_issue', $config['push_issue']);
         }
-        if (isset($config['tag_pattern'])){
+        if (isset($config['ignored_statuses'])) {
+            $container->setParameter('behat.jira.ignored_statuses', $config['ignored_statuses']);
+        }
+        if (isset($config['tag_pattern'])) {
             $container->setParameter('behat.jira.tag_pattern', $config['tag_pattern']);
         }
         if (isset($config['cache_directory'])) {
@@ -103,6 +106,9 @@ class Extension implements ExtensionInterface
                 end()->
                 scalarNode('tag_pattern')->
                     defaultValue('/jira:(.*)/')->
+                end()->
+                scalarNode('ignored_statuses')->
+                    defaultNull()->
                 end()->
             end()->
         end();

@@ -47,6 +47,7 @@
             <argument type="string">%behat.jira.password%</argument>
             <argument type="string">%behat.jira.jql%</argument>
             <argument type="string">%behat.jira.feature_field%</argument>
+            <argument type="string">%behat.jira.ignored_statuses%</argument>
         </service>
 
         <service id="behat.jira.listener.hook" class="%behat.jira.listener.hook.class%">
