@@ -94,7 +94,7 @@ class Extension implements ExtensionInterface
                 scalarNode('proxy_port')->
                     defaultValue('')->
                 end()->
-                scalarNode('proxy_user')->
+                scalarNode('proxy_login')->
                     defaultValue('')->
                 end()->
                 scalarNode('proxy_password')->

@@ -96,6 +96,7 @@ class FeatureLoaderService
         }
 
         $customFields = $arrayIssue['customFieldValues'];
+
         foreach ($customFields as $customField) {
             if ($this->featureField == $customField->customfieldId) {
                 $value = current($customField->values);

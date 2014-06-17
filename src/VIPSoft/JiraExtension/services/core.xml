@@ -12,7 +12,7 @@
         <parameter key="behat.jira.host"></parameter>
         <parameter key="behat.jira.proxy_host"></parameter>
         <parameter key="behat.jira.proxy_port"></parameter>
-        <parameter key="behat.jira.proxy_user"></parameter>
+        <parameter key="behat.jira.proxy_login"></parameter>
         <parameter key="behat.jira.proxy_password"></parameter>
         <parameter key="behat.jira.user"></parameter>
         <parameter key="behat.jira.password"></parameter>
@@ -45,7 +45,7 @@
             <argument type="collection">
               <argument key="proxy_host">%behat.jira.proxy_host%</argument>
               <argument key="proxy_port">%behat.jira.proxy_port%</argument>
-              <argument key="proxy_user">%behat.jira.proxy_user%</argument>
+              <argument key="proxy_login">%behat.jira.proxy_login%</argument>
               <argument key="proxy_password">%behat.jira.proxy_password%</argument>
             </argument>
         </service>
