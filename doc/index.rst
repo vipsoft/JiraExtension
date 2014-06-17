@@ -43,7 +43,7 @@ Configuration
 =============
 Activate extension in your **behat.yml** and define your Jira connection settings:
 
-It is improtant for the :code:`user` parameter that you use the username not the email address.
+It is important for the :code:`user` parameter that you use the username not the email address.
 
 .. code-block:: yaml
 
@@ -98,7 +98,7 @@ Description of the Configuration Parameters:
           cache_directory: /tmp/behat-jira 
           push_issue: false # Run behat tests and "push" to the associated Jira Ticket
           ignored_statuses: "Closed,Resolved" # Comma separated list of ignored Jira updates. Issues with these statuses will not be pushed to Jira.
-          tag_pattern: /jira:(.*)/ # A regex pattern to match the revelant tags to push to Jira
+          tag_pattern: /jira:(.*)/ # A regex pattern to match the relevant tags to push to Jira
 
 
 

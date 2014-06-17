@@ -6,12 +6,10 @@
 
 namespace VIPSoft\JiraExtension\EventListener;
 
+use Behat\Behat\Event\ScenarioEvent;
+use Behat\Behat\Event\StepEvent;
+use Behat\Behat\Event\SuiteEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Behat\Behat\Event\ScenarioEvent,
-    Behat\Behat\Event\StepEvent,
-    Behat\Behat\Event\SuiteEvent;
-
 use VIPSoft\JiraExtension\Service\JiraService;
 
 /**
@@ -42,10 +40,10 @@ class HookListener implements EventSubscriberInterface
     {
         $this->commentOnPass = $commentOnPass;
         $this->commentOnFail = $commentOnFail;
-        $this->reopenOnFail = $reopenOnFail;
-        $this->pushIssue = $pushIssue;
-        $this->tagPattern = $tagPattern;
-        $this->jiraService = $jiraService;
+        $this->reopenOnFail  = $reopenOnFail;
+        $this->pushIssue     = $pushIssue;
+        $this->tagPattern    = $tagPattern;
+        $this->jiraService   = $jiraService;
     }
 
     /**
@@ -55,7 +53,7 @@ class HookListener implements EventSubscriberInterface
     {
         return array(
             'afterScenario' => 'afterScenario',
-            'afterSuite' => 'afterSuite'
+            'afterSuite'    => 'afterSuite',
         );
     }
 
@@ -72,12 +70,13 @@ class HookListener implements EventSubscriberInterface
 
         if ($this->pushIssue) {
             $jiraTags = $this->parseJiraTags($scenario->getTags());
-            $text = implode("\n", $this->getStepText($scenario));
-            $issue = $this->jiraService->pushScenario($jiraTags, $text);
+            $text     = implode("\n", $this->getStepText($scenario));
+            $issue    = $this->jiraService->pushScenario($jiraTags, $text);
         } else {
-            $url = $feature->getFile();
+            $url   = $feature->getFile();
             $issue = $this->jiraService->getIssue($url);
         }
+
         if ($issue) {
             $this->postComment($issue, $event->getResult(), $scenario->getTitle());
             $this->updateIssue($issue, $event->getResult());
@@ -92,9 +91,11 @@ class HookListener implements EventSubscriberInterface
     public function afterSuite(SuiteEvent $event)
     {
         if ($this->pushIssue) {
-            file_put_contents('php://stdout', "Pushing issues to Jira...");
+            file_put_contents('php://stdout', 'Pushing issues to Jira...');
+
             $this->jiraService->postIssue();
-            file_put_contents('php://stdout', " done!" . PHP_EOL);
+
+            file_put_contents('php://stdout', ' done!' . PHP_EOL);
         }
     }
 
@@ -129,19 +130,20 @@ class HookListener implements EventSubscriberInterface
 
     /**
      * Parse an array of tags, and find the corresponding Jira Ticket
-     * via the tag pattern regex (default /jira:(.*)/) configurable in 
+     * via the tag pattern regex (default /jira:(.*)/) configurable in
      * the behat.yml
-     * 
-     * @param Array $tags
-     * 
-     * @return Array $jiraTags
+     *
+     * @param array $tags
+     *
+     * @return array $jiraTags
      */
     public function parseJiraTags($tags)
     {
         $jiraTags = array();
+
         foreach ($tags as $value) {
             if (preg_match($this->tagPattern, $value, $results)) {
-                array_push($jiraTags, $results[1]);
+                $jiraTags[] = $results[1];
             }
         }
 
@@ -151,39 +153,39 @@ class HookListener implements EventSubscriberInterface
 
     /**
      * Get the Steps from a scenario as an array of strings
-     * 
-     * @param ScenarioNode $scenario 
-     * 
-     * @return Array $jiraTags
+     *
+     * @param ScenarioNode $scenario
+     *
+     * @return array $jiraTags
      */
     public function getStepText($scenario)
     {
+        // Parse Title
+        $feature = $scenario->getFeature();
+        $title   = basename($feature->getFile());
 
-        $stepArray = array("{code}");
-        $feature = $scenario -> getFeature();
+        $stepArray = array(
+            '{code}',
+            '#Title: ' . $title,
+        );
 
-        //Parse Title
-        $title = basename($feature -> getFile());
-        $stepArray[] = "#Title: " . $title;
+        // Parse Background
+        if ($feature->hasBackground()) {
+            $background  = $feature->getBackground();
+            $stepArray[] = 'Background: ' . $background->getTitle();
 
-        //Parse Background
-        if ($feature -> hasBackground()) {
-            $background = $feature -> getBackground();
-
-            $backgroundSteps = $background -> getSteps();
-            $stepArray[] = "Background: " . $background -> getTitle();
-            foreach ($backgroundSteps as $step) {
-                $stepArray[] = "  " . $step->getType()." ".$step->getText();
+            foreach ($background->getSteps() as $step) {
+                $stepArray[] = '  ' . $step->getType() . ' ' . $step->getText();
             }
         }
 
-        $scenarioSteps = $scenario->getSteps();
-        $stepArray[] = "Scenario: " . $scenario->getTitle();
+        $stepArray[] = 'Scenario: ' . $scenario->getTitle();
 
-        foreach ($scenarioSteps as $step) {
-            $stepArray[] = "  " . $step->getType()." ".$step->getText();
+        foreach ($scenario->getSteps() as $step) {
+            $stepArray[] = '  ' . $step->getType() . ' ' . $step->getText();
         }
-        $stepArray[] = "{code}";
+
+        $stepArray[] = '{code}';
 
         return $stepArray;
     }

@@ -6,8 +6,8 @@
 
 namespace VIPSoft\JiraExtension\Service;
 
-use Behat\Gherkin\Node\FeatureNode,
-    Behat\Gherkin\Parser;
+use Behat\Gherkin\Node\FeatureNode;
+use Behat\Gherkin\Parser;
 
 /**
  * Feature Loader service
@@ -25,17 +25,17 @@ class FeatureLoaderService
     /**
      * Constructor
      *
-     * @param JiraService  $jiraService   Jira service
-     * @param CacheService $cacheService  Cache service
-     * @param Parser       $gherkinParser Gherkin parser
-     * @param string       $featureField  Field in Jira
+     * @param \VIPSoft\JiraExtension\Service\JiraService      $jiraService   Jira service
+     * @param \VIPSoft\JiraExtension\Service\FileCacheService $cacheService  Cache service
+     * @param \Behat\Gherkin\Parser                           $gherkinParser Gherkin parser
+     * @param string                                          $featureField  Field in Jira
      */
     public function __construct($jiraService, $cacheService, $gherkinParser, $featureField)
     {
-        $this->jiraService = $jiraService;
-        $this->cacheService = $cacheService;
+        $this->jiraService   = $jiraService;
+        $this->cacheService  = $cacheService;
         $this->gherkinParser = $gherkinParser;
-        $this->featureField = $featureField;
+        $this->featureField  = $featureField;
     }
 
     /**
@@ -57,14 +57,14 @@ class FeatureLoaderService
     /**
      * Parse feature from issue
      *
-     * @param \StdClass $issue
+     * @param \stdClass $issue
      *
-     * @return FeatureNode
+     * @return \Behat\Gherkin\Node\FeatureNode
      */
     private function parseFeature($issue)
     {
-        $body = $this->getFeature($issue);
-        $url = $this->jiraService->getUrl($issue->key) . '#';
+        $body    = $this->getFeature($issue);
+        $url     = $this->jiraService->getUrl($issue->key) . '#';
         $feature = $this->gherkinParser->parse($body, $url);
 
         if (isset($issue->assignee)) {
@@ -135,7 +135,9 @@ class FeatureLoaderService
 
             if ($feature instanceof FeatureNode) {
                 $features[$issue->key] = $feature;
+
                 $timestamp = $this->cacheService->convertToUnixTimestamp($issue->updated);
+
                 $this->cacheService->write($issue->key, $feature, $timestamp);
             }
         }
@@ -152,7 +154,7 @@ class FeatureLoaderService
      */
     private function createFeature($issue)
     {
-        $issue = $this->jiraService->fetchIssue($issue);
+        $issue   = $this->jiraService->fetchIssue($issue);
         $feature = $this->parseFeature($issue);
 
         if ($feature instanceof FeatureNode) {
@@ -170,10 +172,10 @@ class FeatureLoaderService
     private function createFeatures()
     {
         $timestamp = $this->cacheService->getLatestTimestamp();
-        $issues = $this->jiraService->fetchIssues($timestamp);
-        $features = $this->parseFeatures($issues);
+        $issues    = $this->jiraService->fetchIssues($timestamp);
+        $features  = $this->parseFeatures($issues);
+        $keys      = $this->cacheService->getKeys() ?: array();
 
-        $keys = $this->cacheService->getKeys() ?: array();
         foreach ($keys as $key) {
             if (!array_key_exists($key, $features)) {
                 $features[$key] = $this->cacheService->read($key);

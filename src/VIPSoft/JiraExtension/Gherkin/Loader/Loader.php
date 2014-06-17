@@ -7,7 +7,6 @@
 namespace VIPSoft\JiraExtension\Gherkin\Loader;
 
 use Behat\Gherkin\Loader\AbstractFileLoader;
-
 use VIPSoft\JiraExtension\Service\FeatureLoaderService;
 
 /**
@@ -22,9 +21,9 @@ class Loader extends AbstractFileLoader
     /**
      * Constructor
      *
-     * @param FeatureLoaderService $featureLoaderService
+     * @param \VIPSoft\JiraExtension\Service\FeatureLoaderService $featureLoaderService
      */
-    public function __construct($featureLoaderService)
+    public function __construct(FeatureLoaderService $featureLoaderService)
     {
         $this->featureLoaderService = $featureLoaderService;
     }

@@ -233,7 +233,7 @@ class JiraService
 
     /**
      * Add Scenario to internal store
-     * 
+     *
      * @param array  $jiraTags
      * @param string $scenarioText
      */
@@ -265,11 +265,11 @@ class JiraService
     }
 
     /**
-     * Compare the issue fields if they are the same or not 
-     * 
+     * Compare the issue fields if they are the same or not
+     *
      * @param string $jiraTicket
      * @param string $value
-     * 
+     *
      * @return boolean
      */
     public function compareIssueField($jiraTicket, $value)
@@ -300,10 +300,10 @@ class JiraService
 
     /**
      * This method checks the status of the Jira Ticket to ensure that
-     * it is not in the array of ignored statuses. 
+     * it is not in the array of ignored statuses.
      *
      * @param string $ticket Jira ticket id to check the status of
-     * 
+     *
      * @return boolean true/false if the ticket is supposed to ignored
      */
     public function isIgnored($ticket)
@@ -351,7 +351,7 @@ class JiraService
 
     /**
      * Return the internal store of JiraTickets and Features
-     * 
+     *
      * @return array $store
      */
     public function getStore()
@@ -361,12 +361,11 @@ class JiraService
 
     /**
      * Return the internal list of JiraTickets that are ignored due to their status
-     * 
+     *
      * @return array $ignoredIssues
      */
     public function getIgnoredIssues()
     {
         return $this->ignoredIssues;
     }
-
 }

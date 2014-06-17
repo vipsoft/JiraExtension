@@ -164,6 +164,7 @@ class FileCacheService
         if (!is_dir($this->cacheDirectory)) {
             mkdir($this->cacheDirectory, 0775, true);
         }
+
         file_put_contents($this->cacheDirectory . '/' . $key, serialize($content));
     }
 }
