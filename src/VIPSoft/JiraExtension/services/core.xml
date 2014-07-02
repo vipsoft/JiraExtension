@@ -43,10 +43,12 @@
         <service id="behat.jira.soap_client" class="SoapClient" public="false">
             <argument type="string">%behat.jira.host%/rpc/soap/jirasoapservice-v2?wsdl</argument>
             <argument type="collection">
+              <!--
               <argument key="proxy_host">%behat.jira.proxy_host%</argument>
               <argument key="proxy_port">%behat.jira.proxy_port%</argument>
               <argument key="proxy_login">%behat.jira.proxy_login%</argument>
               <argument key="proxy_password">%behat.jira.proxy_password%</argument>
+              -->
             </argument>
         </service>
 
